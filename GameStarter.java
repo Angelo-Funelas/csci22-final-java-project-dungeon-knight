@@ -6,5 +6,6 @@ public class GameStarter {
         game.startAnimationThread();
         game.prepareLevel();
         game.initPlayer();
+        game.startGameLoop();
     }
 }

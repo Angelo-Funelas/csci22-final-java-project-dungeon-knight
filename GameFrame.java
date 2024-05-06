@@ -26,6 +26,9 @@ public class GameFrame implements KeyListener {
         frame.pack();
         frame.addKeyListener(this);
         frame.setFocusable(true);
+    }
+
+    public void startGameLoop() {
         lastFrameTime = System.currentTimeMillis();
         Timer gameTicker = new Timer(16, new ActionListener() {
             @Override
