@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public interface GameObject {
     void draw(Graphics2D g2d);
@@ -6,5 +7,6 @@ public interface GameObject {
     double getY();
     int getWidth();
     int getHeight();
-    boolean isColliding();
+    ArrayList<CollisionBox> getCollisionBoxes();
+    boolean isColliding(GameObject other);
 }

@@ -35,21 +35,26 @@ public class GameCanvas extends JComponent {
         g2d.setRenderingHints(rh);
 
         AffineTransform reset = g2d.getTransform();
-        g2d.translate((-target.getX()*zoom)+(width/2)-(target.getWidth()/2), (-target.getY()*zoom)+(height/2)-(target.getHeight()/2));
-        g2d.scale(zoom, zoom);
+        if (target != null) {
+            g2d.translate((-target.getX()*zoom)+(width/2)-(target.getWidth()/2), (-target.getY()*zoom)+(height/2)-(target.getHeight()/2));
+            g2d.scale(zoom, zoom);
+        }
 
         Rectangle2D.Double bg = new Rectangle2D.Double(-width/2,-height/2,width*2,height*2);
         g2d.setPaint(backgroundColor);
         g2d.fill(bg);
-
-        for (GameObject object : GameObjects) {
-            object.draw(g2d);
+        synchronized (GameObjects) {
+            for (GameObject object : GameObjects) {
+                object.draw(g2d);
+            }
         }
         g2d.setTransform(reset);
     }
 
     public void addGameObject(GameObject obj) {
-        GameObjects.add(obj);
+        synchronized (GameObjects) {
+            GameObjects.add(obj);
+        }
     }
 }
 

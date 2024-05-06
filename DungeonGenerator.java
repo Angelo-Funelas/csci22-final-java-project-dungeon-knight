@@ -26,11 +26,12 @@ public class DungeonGenerator {
             }
         }
     }
-    public BufferedImage GenerateBattleRoom() {
-        int areaWidth = 368; // Example area width
-        int areaHeight = 384; // Example area height
+    public DungeonPiece GenerateBattleRoom(int tileWidth, int tileHeight, int doorUp, int doorDown, int doorLeft, int doorRight) {
+        int areaWidth = tileWidth*16; // Example area width
+        int areaHeight = (tileHeight*16)+16; // Example area height
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = combinedImage.createGraphics();
+        ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
 
         // Generate Floor
         for (int y = 1; y < 22; y++) {
@@ -60,7 +61,14 @@ public class DungeonGenerator {
             }
         }
 
+        // generate collision boxes
+        if (doorUp==0) {
+            CollisionBox wallTop = new CollisionBox(0,0,areaWidth,12);
+            collBoxes.add(wallTop);
+        }
+
         g2d.dispose();
-        return combinedImage;
+        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, 368, 384, collBoxes);
+        return dungeon1Obj;
     }
 }

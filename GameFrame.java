@@ -11,6 +11,7 @@ public class GameFrame implements KeyListener {
     private GameCanvas canvas;
     private AnimationThread AnimationThread;
     private long lastFrameTime;
+    DungeonPiece dungeon1;
 
     public GameFrame() {
         frame = new JFrame();
@@ -61,9 +62,8 @@ public class GameFrame implements KeyListener {
 
     public void prepareLevel() {
         DungeonGenerator dg = new DungeonGenerator();
-        BufferedImage dungeon1 = dg.GenerateBattleRoom();
-        DungeonPiece dungeon1Obj = new DungeonPiece(dungeon1, 368, 384);
-        canvas.addGameObject(dungeon1Obj);
+        dungeon1 = dg.GenerateBattleRoom(23,23,0,0,0,0);
+        canvas.addGameObject(dungeon1);
     }
 
     public void tick() {
@@ -71,6 +71,9 @@ public class GameFrame implements KeyListener {
         long deltaTime = currentTime - lastFrameTime;
 
         player.update(deltaTime);
+        if (player.isColliding(dungeon1)) {
+            System.out.println("colliding");
+        }
 
         lastFrameTime = currentTime;
     }

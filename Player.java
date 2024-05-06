@@ -12,6 +12,7 @@ public class Player implements GameObject, Entity {
     private double x,y,dx,dy;
     private boolean moveUp, moveDown, moveLeft, moveRight;
     private double acceleration, friction, maxSpeed, speedModifier;
+    private ArrayList<CollisionBox> collBoxes;
 
     public Player(int scale) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -32,6 +33,9 @@ public class Player implements GameObject, Entity {
         friction = 0.8;
         width = sprite.getWidth();
         height = sprite.getHeight();
+        collBoxes = new ArrayList<CollisionBox>();
+        CollisionBox collBox = new CollisionBox(x, y, width-5, height);
+        collBoxes.add(collBox);
     }
 
     public double getX() {return x;}
@@ -39,6 +43,11 @@ public class Player implements GameObject, Entity {
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
+        if (GameStarter.debugMode) {
+            for (CollisionBox box : collBoxes) {
+                box.draw(g2d);
+            }
+        }
     }
 
     public Sprite getSprite() {
@@ -64,6 +73,7 @@ public class Player implements GameObject, Entity {
 
         x += dx;
         y += dy;
+        collBoxes.get(0).setPos(x+4,y);
     }
 
     public void setUp(boolean b) {moveUp = b;}
@@ -74,6 +84,12 @@ public class Player implements GameObject, Entity {
     public int getWidth() {return width;}
     public int getHeight() {return height;}
 
-    public boolean isColliding() {return true;}
+    public ArrayList<CollisionBox> getCollisionBoxes() {
+        return collBoxes;
+    }
+
+    public boolean isColliding(GameObject other) {
+        return collBoxes.get(0).isColliding(other);
+    }
 
 }
