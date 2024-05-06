@@ -9,6 +9,8 @@ public class Sprite {
     private ArrayList<BufferedImage> frames;
     private BufferedImage cur_sprite;
     private int sprite_i;
+    private int width, height;
+
     public Sprite(ArrayList<File> frames) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
         for (File file : frames) {
@@ -21,6 +23,8 @@ public class Sprite {
         this.frames = new_frames;
         sprite_i = 0;
         cur_sprite = this.frames.get(sprite_i);
+        width = cur_sprite.getWidth();
+        height = cur_sprite.getHeight();
     }
     public void update() {
         sprite_i = (sprite_i+=1)%frames.size();
@@ -32,4 +36,6 @@ public class Sprite {
         g2d.drawImage(cur_sprite, 0, 0, scale, scale, null);
         g2d.setTransform(reset);
     }
+    public int getWidth() {return width;}
+    public int getHeight() {return height;}
 }

@@ -30,7 +30,7 @@ public class GameFrame implements KeyListener {
 
     public void startGameLoop() {
         lastFrameTime = System.currentTimeMillis();
-        Timer gameTicker = new Timer(16, new ActionListener() {
+        Timer gameTicker = new Timer(30, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 tick();
@@ -48,6 +48,7 @@ public class GameFrame implements KeyListener {
         player = new Player(26);
         canvas.addGameObject(player);
         AnimationThread.addSprite(player.getSprite());
+        canvas.focus(player);
     }
 
     public void prepareLevel() {

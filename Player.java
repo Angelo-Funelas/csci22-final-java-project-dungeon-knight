@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
-    private int scale;
+    private int scale, width, height;
     private double x,y;
     private boolean moveUp, moveDown, moveLeft, moveRight;
     private double speed;
@@ -27,6 +27,8 @@ public class Player implements GameObject, Entity {
         x = 80.5;
         y = 80.5;
         speed = 50;
+        width = sprite.getWidth();
+        height = sprite.getHeight();
     }
 
     public double getX() {return x;}
@@ -51,4 +53,7 @@ public class Player implements GameObject, Entity {
     public void setDown(boolean b) {moveDown = b;}
     public void setLeft(boolean b) {moveLeft = b;}
     public void setRight(boolean b) {moveRight = b;}
+
+    public int getWidth() {return width;}
+    public int getHeight() {return height;}
 }

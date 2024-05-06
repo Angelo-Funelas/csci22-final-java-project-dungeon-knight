@@ -10,6 +10,8 @@ public class GameCanvas extends JComponent {
     private int height;
     private ArrayList<GameObject> GameObjects;
     private Color backgroundColor;
+    private GameObject target;
+    private double zoom = 3;
     
     public GameCanvas(int w, int h) {
         width = w;
@@ -21,14 +23,21 @@ public class GameCanvas extends JComponent {
         backgroundColor = new Color(5, 31, 41,255);
     }
 
+    public void focus(GameObject obj) {
+        target = obj;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
+
         AffineTransform reset = g2d.getTransform();
-        g2d.scale(3, 3);
+        g2d.translate((-target.getX()*zoom)+(width/2)-(target.getWidth()/2), (-target.getY()*zoom)+(height/2)-(target.getHeight()/2));
+        g2d.scale(zoom, zoom);
+
         Rectangle2D.Double bg = new Rectangle2D.Double(-width/2,-height/2,width*2,height*2);
         g2d.setPaint(backgroundColor);
         g2d.fill(bg);
