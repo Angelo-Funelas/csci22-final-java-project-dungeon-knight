@@ -34,14 +34,5 @@ public class DungeonPiece implements GameObject {
 
     public int getWidth() {return width;}
     public int getHeight() {return height;}
-    public boolean isColliding(GameObject other) {
-        boolean res = false;
-        for (CollisionBox box : collBoxes) {
-            if (box.isColliding(other)) {
-                res = true;
-                break;
-            };
-        }
-        return res;
-    }
+    public boolean isColliding(CollisionBox other) {return false;}
 }

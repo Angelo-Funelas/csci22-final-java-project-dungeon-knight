@@ -66,6 +66,18 @@ public class DungeonGenerator {
             CollisionBox wallTop = new CollisionBox(0,0,areaWidth,12);
             collBoxes.add(wallTop);
         }
+        if (doorDown==0) {
+            CollisionBox wallTop = new CollisionBox(0,(tileHeight*16)-12,areaWidth,12);
+            collBoxes.add(wallTop);
+        }
+        if (doorLeft==0) {
+            CollisionBox wallTop = new CollisionBox(0,12,12,areaHeight-(16+12+12));
+            collBoxes.add(wallTop);
+        }
+        if (doorRight==0) {
+            CollisionBox wallTop = new CollisionBox(areaWidth-12,12,12,areaHeight-(16+12+12));
+            collBoxes.add(wallTop);
+        }
 
         g2d.dispose();
         DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, 368, 384, collBoxes);

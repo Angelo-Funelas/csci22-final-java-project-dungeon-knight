@@ -27,24 +27,30 @@ public class CollisionBox {
     public double getY() {return y;}
     public int getWidth() {return width;}
     public int getHeight() {return height;}
-    public boolean isColliding(GameObject other) {
-        boolean res = false;
-        for (CollisionBox box : other.getCollisionBoxes()) {
-            double x1, x2, y1, y2; 
-            x1 = x;
-            x2 = x+width;
-            y1 = y;
-            y2 = y+height;
-            if (
-                x1 < box.getX()+box.getWidth() &&
-                x2 > box.getX() &&
-                y1 < box.getY()+box.getHeight() &&
-                y2 > box.getY()
-            ) {
-                res = true;
-                break;
-            };
-        }
-        return res;
+    public boolean isColliding(CollisionBox other) {
+        double x1, x2, y1, y2; 
+        x1 = x;
+        x2 = x+width;
+        y1 = y;
+        y2 = y+height;
+        return (
+            x1 < other.getX()+other.getWidth() &&
+            x2 > other.getX() &&
+            y1 < other.getY()+other.getHeight() &&
+            y2 > other.getY()
+        );
+    }
+    public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {
+        double x1, x2, y1, y2; 
+        x1 = x+offsetX;
+        x2 = x+offsetX+width;
+        y1 = y+offsetY;
+        y2 = y+offsetY+height;
+        return (
+            x1 < other.getX()+other.getWidth() &&
+            x2 > other.getX() &&
+            y1 < other.getY()+other.getHeight() &&
+            y2 > other.getY()
+        );
     }
 }

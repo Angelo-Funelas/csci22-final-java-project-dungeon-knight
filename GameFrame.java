@@ -39,7 +39,7 @@ public class GameFrame implements KeyListener {
 
     public void startGameLoop() {
         lastFrameTime = System.currentTimeMillis();
-        Timer gameTicker = new Timer(30, new ActionListener() {
+        Timer gameTicker = new Timer(1000/GameStarter.framerate, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 tick();
@@ -63,6 +63,7 @@ public class GameFrame implements KeyListener {
     public void prepareLevel() {
         DungeonGenerator dg = new DungeonGenerator();
         dungeon1 = dg.GenerateBattleRoom(23,23,0,0,0,0);
+        Map.addPiece(dungeon1);
         canvas.addGameObject(dungeon1);
     }
 
@@ -71,9 +72,6 @@ public class GameFrame implements KeyListener {
         long deltaTime = currentTime - lastFrameTime;
 
         player.update(deltaTime);
-        if (player.isColliding(dungeon1)) {
-            System.out.println("colliding");
-        }
 
         lastFrameTime = currentTime;
     }

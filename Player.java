@@ -28,13 +28,13 @@ public class Player implements GameObject, Entity {
         this.scale = scale;
         x = 80.5;
         y = 80.5;
-        acceleration = 20;
-        maxSpeed = 40;
+        acceleration = 25;
+        maxSpeed = 90;
         friction = 0.8;
         width = sprite.getWidth();
         height = sprite.getHeight();
         collBoxes = new ArrayList<CollisionBox>();
-        CollisionBox collBox = new CollisionBox(x, y, width-5, height);
+        CollisionBox collBox = new CollisionBox(x, y, width-8, height-6);
         collBoxes.add(collBox);
     }
 
@@ -60,20 +60,38 @@ public class Player implements GameObject, Entity {
         if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
         if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
 
-        maxSpeed = 40;
+        double cur_maxSpeed = maxSpeed;
         if ((moveUp || moveDown) && (moveLeft || moveRight) && !(moveUp && moveDown) && !(moveLeft && moveRight)) {
-            maxSpeed = Math.sqrt(maxSpeed*maxSpeed/2);
+            cur_maxSpeed = Math.sqrt(cur_maxSpeed*cur_maxSpeed/2);
         }
+        cur_maxSpeed *= dt / 1000.0;
         if (moveUp||moveDown||moveLeft||moveRight) {sprite.setWalking(true);} else {sprite.setWalking(false);}
 
-        dx = Math.max(-maxSpeed, Math.min(maxSpeed, dx));
-        dy = Math.max(-maxSpeed, Math.min(maxSpeed, dy));
+        dx = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dx));
+        dy = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dy));
         dx *= friction;
         dy *= friction;
 
-        x += dx;
-        y += dy;
-        collBoxes.get(0).setPos(x+4,y);
+        boolean collidedX = false;
+        boolean collidedY = false;
+        for (CollisionBox box : Map.getCollisionBoxes()) {
+            if (isColliding(box, dx, 0)) {
+                collidedX = true;
+                dx = 0;
+            }
+            if (isColliding(box, 0, dy)) {
+                collidedY = true;
+                dy = 0;
+            }
+        }
+        if (!collidedX) {
+            x += dx;
+        }
+        if (!collidedY) {
+            y += dy;
+        }
+
+        collBoxes.get(0).setPos(x+4,y+5);
     }
 
     public void setUp(boolean b) {moveUp = b;}
@@ -88,8 +106,12 @@ public class Player implements GameObject, Entity {
         return collBoxes;
     }
 
-    public boolean isColliding(GameObject other) {
+    public boolean isColliding(CollisionBox other) {
         return collBoxes.get(0).isColliding(other);
+    }
+
+    public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {
+        return collBoxes.get(0).isColliding(other, offsetX, offsetY);
     }
 
 }

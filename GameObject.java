@@ -8,5 +8,5 @@ public interface GameObject {
     int getWidth();
     int getHeight();
     ArrayList<CollisionBox> getCollisionBoxes();
-    boolean isColliding(GameObject other);
+    boolean isColliding(CollisionBox other);
 }
