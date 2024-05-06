@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.image.*;
 import javax.imageio.*;
+import javax.sound.sampled.spi.MixerProvider;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height;
-    private double x,y;
+    private double x,y,dx,dy;
     private boolean moveUp, moveDown, moveLeft, moveRight;
-    private double speed;
+    private double acceleration, friction, maxSpeed, speedModifier;
 
     public Player(int scale) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -26,7 +27,9 @@ public class Player implements GameObject, Entity {
         this.scale = scale;
         x = 80.5;
         y = 80.5;
-        speed = 50;
+        acceleration = 20;
+        maxSpeed = 40;
+        friction = 0.8;
         width = sprite.getWidth();
         height = sprite.getHeight();
     }
@@ -41,12 +44,20 @@ public class Player implements GameObject, Entity {
     public Sprite getSprite() {
         return sprite;
     }
-
+    // sqrt((speed*speed)/2) = a
     public void update(long dt) {
-        if (moveUp) {y -= (double) speed * dt / 1000.0;}
-        if (moveDown) {y += (double) speed * dt / 1000.0;}
-        if (moveLeft) {x -= (double) speed * dt / 1000.0;}
-        if (moveRight) {x += (double) speed * dt / 1000.0;}
+        if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
+        if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
+        if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
+        if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
+
+        dx = Math.max(-maxSpeed, Math.min(maxSpeed, dx));
+        dy = Math.max(-maxSpeed, Math.min(maxSpeed, dy));
+        dx *= friction;
+        dy *= friction;
+
+        x += dx;
+        y += dy;
     }
 
     public void setUp(boolean b) {moveUp = b;}

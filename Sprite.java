@@ -10,6 +10,7 @@ public class Sprite {
     private BufferedImage cur_sprite;
     private int sprite_i;
     private int width, height;
+    private int faceDir = 1;
 
     public Sprite(ArrayList<File> frames) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
@@ -32,10 +33,15 @@ public class Sprite {
     }
     public void draw(Graphics2D g2d, int scale, double x, double y) {
         AffineTransform reset = g2d.getTransform();
+        if (faceDir == -1) {
+            x += width;
+        }
         g2d.translate(x, y);
-        g2d.drawImage(cur_sprite, 0, 0, scale, scale, null);
+        g2d.drawImage(cur_sprite, 0, 0, scale*faceDir, scale, null);
         g2d.setTransform(reset);
     }
+    public void faceLeft() {faceDir = -1;}
+    public void faceRight() {faceDir = 1;}
     public int getWidth() {return width;}
     public int getHeight() {return height;}
 }
