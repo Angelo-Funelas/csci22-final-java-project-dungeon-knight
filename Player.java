@@ -23,7 +23,7 @@ public class Player implements GameObject, Entity {
         sprite_frames.add(new File("sprites/rogue_frame_5.png"));
         sprite_frames.add(new File("sprites/rogue_frame_6.png"));
         sprite_frames.add(new File("sprites/rogue_frame_7.png"));
-        sprite = new Sprite(sprite_frames);
+        sprite = new Sprite(sprite_frames, 2);
         this.scale = scale;
         x = 80.5;
         y = 80.5;
@@ -51,6 +51,12 @@ public class Player implements GameObject, Entity {
         if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
         if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
 
+        maxSpeed = 40;
+        if ((moveUp || moveDown) && (moveLeft || moveRight) && !(moveUp && moveDown) && !(moveLeft && moveRight)) {
+            maxSpeed = Math.sqrt(maxSpeed*maxSpeed/2);
+        }
+        if (moveUp||moveDown||moveLeft||moveRight) {sprite.setWalking(true);} else {sprite.setWalking(false);}
+
         dx = Math.max(-maxSpeed, Math.min(maxSpeed, dx));
         dy = Math.max(-maxSpeed, Math.min(maxSpeed, dy));
         dx *= friction;
@@ -67,4 +73,7 @@ public class Player implements GameObject, Entity {
 
     public int getWidth() {return width;}
     public int getHeight() {return height;}
+
+    public boolean isColliding() {return true;}
+
 }

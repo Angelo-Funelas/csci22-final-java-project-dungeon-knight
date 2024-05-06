@@ -5,8 +5,10 @@ public class DungeonPiece implements GameObject {
     BufferedImage image;
     int scaleX, scaleY, width, height;
     double x,y;
+
     public double getX() {return x;}
     public double getY() {return y;}
+
     public DungeonPiece(BufferedImage img, int scaleX, int scaleY) {
         image = img;
         this.scaleX = scaleX;
@@ -19,4 +21,5 @@ public class DungeonPiece implements GameObject {
     }
     public int getWidth() {return width;}
     public int getHeight() {return height;}
+    public boolean isColliding() {return true;}
 }

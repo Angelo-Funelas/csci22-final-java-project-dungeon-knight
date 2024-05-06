@@ -6,4 +6,5 @@ public interface GameObject {
     double getY();
     int getWidth();
     int getHeight();
+    boolean isColliding();
 }

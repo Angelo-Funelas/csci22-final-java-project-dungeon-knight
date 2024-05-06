@@ -26,6 +26,14 @@ public class GameFrame implements KeyListener {
         frame.pack();
         frame.addKeyListener(this);
         frame.setFocusable(true);
+        frame.addWindowFocusListener(new WindowAdapter() {
+            public void windowLostFocus(WindowEvent e) {
+                player.setUp(false);
+                player.setDown(false);
+                player.setLeft(false);
+                player.setRight(false);
+            }
+        });
     }
 
     public void startGameLoop() {

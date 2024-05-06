@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import javax.imageio.*;
+import javax.sound.midi.SysexMessage;
 
 public class Sprite {
     private ArrayList<BufferedImage> frames;
@@ -11,8 +12,10 @@ public class Sprite {
     private int sprite_i;
     private int width, height;
     private int faceDir = 1;
+    private boolean isWalking;
+    private double maxJumpHeight;
 
-    public Sprite(ArrayList<File> frames) {
+    public Sprite(ArrayList<File> frames, double maxJumpHeight) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
         for (File file : frames) {
             try {
@@ -26,17 +29,25 @@ public class Sprite {
         cur_sprite = this.frames.get(sprite_i);
         width = cur_sprite.getWidth();
         height = cur_sprite.getHeight();
+        this.maxJumpHeight = maxJumpHeight;
     }
     public void update() {
         sprite_i = (sprite_i+=1)%frames.size();
         cur_sprite = frames.get(sprite_i);
     }
+    public void setWalking(boolean b) {isWalking = b;}
     public void draw(Graphics2D g2d, int scale, double x, double y) {
         AffineTransform reset = g2d.getTransform();
         if (faceDir == -1) {
             x += width;
         }
-        g2d.translate(x, y);
+        double jheight;
+        if (isWalking) {
+            jheight = (maxJumpHeight/2)*(Math.sin(2*Math.PI*((sprite_i)-1.75)/7))+(maxJumpHeight/2);
+        } else {
+            jheight = 0;
+        }
+        g2d.translate(x, y-jheight);
         g2d.drawImage(cur_sprite, 0, 0, scale*faceDir, scale, null);
         g2d.setTransform(reset);
     }
@@ -44,4 +55,5 @@ public class Sprite {
     public void faceRight() {faceDir = 1;}
     public int getWidth() {return width;}
     public int getHeight() {return height;}
+    
 }
