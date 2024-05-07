@@ -8,6 +8,9 @@ import java.util.Random;
 
 public class DungeonGenerator {
     ArrayList<BufferedImage> mapList = new ArrayList<BufferedImage>();
+    private int doorTileWidth = 5;
+    private int doorWidth = doorTileWidth*16;
+
     public DungeonGenerator() {
         ArrayList<File> spriteSrcs = new ArrayList<File>();
         spriteSrcs.add(new File("tiles/floor0.png"));
@@ -26,7 +29,7 @@ public class DungeonGenerator {
             }
         }
     }
-    public DungeonPiece GenerateBattleRoom(int tileWidth, int tileHeight, int doorUp, int doorDown, int doorLeft, int doorRight) {
+    public DungeonPiece GenerateBattleRoom(int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight) {
         int areaWidth = tileWidth*16;
         int areaHeight = (tileHeight*16)+16;
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
@@ -52,31 +55,69 @@ public class DungeonGenerator {
                 randomSpriteIndex = random.nextInt(7 - 6 + 1) + 6;
                 BufferedImage randomSprite = mapList.get(randomSpriteIndex);
                 if (y>0&&y<tileWidth-1) {
-                    g2d.drawImage(randomSprite, 0, y*16, null);
-                    g2d.drawImage(randomSprite, (tileWidth-1)*16, y*16, null);
+                    // draw side walls
+                    if (
+                        (y >= Math.floor(tileHeight/2-doorTileWidth/2)
+                        && y <= Math.floor(tileHeight/2+doorTileWidth/2))
+                    ) {
+                        if (!doorLeft) {
+                            g2d.drawImage(randomSprite, 0, y*16, null);
+                        }
+                        if (!doorRight) {
+                            g2d.drawImage(randomSprite, (tileWidth-1)*16, y*16, null);
+                        }
+                    } else {
+                        g2d.drawImage(randomSprite, 0, y*16, null);
+                        g2d.drawImage(randomSprite, (tileWidth-1)*16, y*16, null);
+                    }
                     break;
                 } else {
-                    g2d.drawImage(randomSprite, x * 16, y * 16, null);
+                    // draw top and bottom walls
+                    if (
+                        !(x >= Math.floor(tileWidth/2-doorTileWidth/2)
+                        && x <= Math.floor(tileWidth/2+doorTileWidth/2))
+                        || (!doorUp && y==0)
+                        || (!doorDown && y==tileHeight-1)
+                    ) {
+                        g2d.drawImage(randomSprite, x * 16, y * 16, null);
+                    } 
                 }
             }
         }
 
+        int wallThickness = 12;
         // generate collision boxes
-        if (doorUp==0) {
-            CollisionBox wallTop = new CollisionBox(0,0,areaWidth,12);
-            collBoxes.add(wallTop);
+        if (!doorUp) {
+            collBoxes.add(new CollisionBox(0,0,areaWidth,wallThickness));
+        } else {
+            collBoxes.add(new CollisionBox(0,0,areaWidth/2-doorWidth/2,wallThickness));
+            collBoxes.add(new CollisionBox(areaWidth/2+doorWidth/2,0,areaWidth/2-doorWidth/2,wallThickness));
         }
-        if (doorDown==0) {
-            CollisionBox wallTop = new CollisionBox(0,(tileHeight*16)-12,areaWidth,12);
-            collBoxes.add(wallTop);
+        if (!doorDown) {
+            collBoxes.add(new CollisionBox(0,(tileHeight*16)-wallThickness,areaWidth,wallThickness));
+        } else {
+            collBoxes.add(new CollisionBox(0,(tileHeight*16)-wallThickness,areaWidth/2-doorWidth/2,wallThickness));
+            collBoxes.add(new CollisionBox(areaWidth/2+doorWidth/2,(tileHeight*16)-wallThickness,areaWidth/2-doorWidth/2,wallThickness));
         }
-        if (doorLeft==0) {
-            CollisionBox wallTop = new CollisionBox(0,12,12,areaHeight-(16+12+12));
+
+        int wallHeight = (areaHeight-16-wallThickness*2)/2-(doorWidth/2); 
+        if (!doorLeft) {
+            CollisionBox wallTop = new CollisionBox(0,wallThickness,wallThickness,areaHeight-(16+wallThickness+wallThickness));
             collBoxes.add(wallTop);
+        } else {
+            CollisionBox wallTopT = new CollisionBox(0,wallThickness,wallThickness, wallHeight);
+            CollisionBox wallTopB = new CollisionBox(0,wallThickness+wallHeight+doorWidth,wallThickness, wallHeight);
+            collBoxes.add(wallTopT);
+            collBoxes.add(wallTopB);
         }
-        if (doorRight==0) {
-            CollisionBox wallTop = new CollisionBox(areaWidth-12,12,12,areaHeight-(16+12+12));
+        if (!doorRight) {
+            CollisionBox wallTop = new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness,areaHeight-(16+wallThickness*2));
             collBoxes.add(wallTop);
+        } else {
+            CollisionBox wallTopT = new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness, wallHeight);
+            CollisionBox wallTopB = new CollisionBox(areaWidth-wallThickness,wallThickness+wallHeight+doorWidth,wallThickness, wallHeight);
+            collBoxes.add(wallTopT);
+            collBoxes.add(wallTopB);
         }
 
         g2d.dispose();
