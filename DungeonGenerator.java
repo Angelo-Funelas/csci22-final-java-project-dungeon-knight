@@ -17,8 +17,8 @@ public class DungeonGenerator {
         spriteSrcs.add(new File("tiles/floor1.png"));
         spriteSrcs.add(new File("tiles/floor2.png"));
         spriteSrcs.add(new File("tiles/floorblock.png"));
-        spriteSrcs.add(new File("tiles/spike.png"));
         spriteSrcs.add(new File("tiles/spikeretracted.png"));
+        spriteSrcs.add(new File("tiles/spike.png"));
         spriteSrcs.add(new File("tiles/stonewall.png"));
         spriteSrcs.add(new File("tiles/wall.png"));
         for (File src : spriteSrcs) {
@@ -54,6 +54,7 @@ public class DungeonGenerator {
                 Random random = new Random();
                 randomSpriteIndex = random.nextInt(7 - 6 + 1) + 6;
                 BufferedImage randomSprite = mapList.get(randomSpriteIndex);
+                BufferedImage retractedSpike = mapList.get(4);
                 if (y>0&&y<tileWidth-1) {
                     // draw side walls
                     if (
@@ -62,9 +63,13 @@ public class DungeonGenerator {
                     ) {
                         if (!doorLeft) {
                             g2d.drawImage(randomSprite, 0, y*16, null);
+                        } else {
+                            g2d.drawImage(retractedSpike, 0, y*16+7, null);
                         }
                         if (!doorRight) {
                             g2d.drawImage(randomSprite, (tileWidth-1)*16, y*16, null);
+                        } else {
+                            g2d.drawImage(retractedSpike, (tileWidth-1)*16, y*16+7, null);
                         }
                     } else {
                         g2d.drawImage(randomSprite, 0, y*16, null);
@@ -80,7 +85,9 @@ public class DungeonGenerator {
                         || (!doorDown && y==tileHeight-1)
                     ) {
                         g2d.drawImage(randomSprite, x * 16, y * 16, null);
-                    } 
+                    } else {
+                        g2d.drawImage(retractedSpike, x * 16, y * 16+7, null);
+                    }
                 }
             }
         }
