@@ -3,18 +3,130 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class GameFrame implements KeyListener {
     private JFrame frame;
     static int canvasWidth = 800;
     static int canvasHeight = 600;
-    private Player player;
     private GameCanvas canvas;
     private AnimationThread AnimationThread;
     private long lastFrameTime;
-    DungeonPiece dungeon1;
+    private Map curMap;
+    private Player player;
+    private ArrayList<Player> allies;
+    private HashMap<Integer, Player> clients;
+
+    private Socket socket;
+    private int clientID;
+    private ReadFromServer rfsRunnable;
+    private WriteToServer wtsRunnable;
+    private Thread readThread, writeThread;
 
     public GameFrame() {
         frame = new JFrame();
+    }
+
+    private void connectToServer() {
+        try {
+            socket = new Socket("localhost", 55555);
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+            rfsRunnable = new ReadFromServer(in);
+            wtsRunnable = new WriteToServer(out);
+
+            readThread = new Thread(rfsRunnable);
+            writeThread = new Thread(wtsRunnable);
+            readThread.start();
+            writeThread.start();
+
+            allies = new ArrayList<Player>();
+            clients = new HashMap<Integer, Player>();
+        } catch (IOException ex) {
+            System.out.println("IOException from connectToServer()");
+        }
+    }
+
+    private class ReadFromServer implements Runnable {
+        private DataInputStream dataIn;
+
+        public ReadFromServer(DataInputStream in) {
+            dataIn = in;
+        }
+
+        public void run() {
+            while (true) {
+                try {
+                    String command = dataIn.readUTF();
+                    if (command.startsWith("com_")) {
+                        switch (command) {
+                            case "com_setID":
+                                clientID = dataIn.readInt();
+                                System.out.println("Connected to server as Client #" + clientID);
+                                break;
+                            case "com_newClient":
+                                int newClientId = dataIn.readInt();
+                                if (newClientId != clientID) {
+                                    Player ally = new Player(26);
+                                    canvas.addGameObject(ally);
+                                    AnimationThread.addSprite(ally.getSprite());
+                                    clients.put(newClientId, ally);
+                                }
+                                break;
+                            case "com_setAllyPos":
+                                int targetID = dataIn.readInt();
+                                double data_x = dataIn.readDouble();
+                                double data_y = dataIn.readDouble();
+                                System.out.println(data_x + " " + data_y);
+                                if (targetID!=clientID) {
+                                    Player targetAlly = clients.get(targetID);
+                                    if (targetAlly != null) {
+                                        targetAlly.setX(data_x);
+                                        targetAlly.setY(data_y);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                } catch (IOException ex) {
+                    System.out.println("IOException from ReadFromServer Thread");
+                }
+            }
+        }
+    }
+
+    private class WriteToServer implements Runnable {
+        private DataOutputStream dataOut;
+
+        public WriteToServer(DataOutputStream out) {
+            dataOut = out;
+        }
+
+        public void setPos() {
+            try {
+                dataOut.writeUTF("setPos");
+                dataOut.writeDouble(player.getX());
+                dataOut.writeDouble(player.getY());
+            } catch (IOException ex) {
+                System.out.println("IOException at setPos");
+            } 
+        }
+
+        public void run() {
+            while (true) {
+                setPos();
+                try {
+                    Thread.sleep(25); // some delay for writing data
+                }
+                catch (InterruptedException ex) {
+                    System.out.println("InterruptedException from WTS run()");
+                }
+            }
+        }
     }
 
     public void setUpGUI() {
@@ -58,20 +170,21 @@ public class GameFrame implements KeyListener {
         canvas.addGameObject(player);
         AnimationThread.addSprite(player.getSprite());
         canvas.focus(player);
+        connectToServer();
     }
 
     public void prepareLevel() {
-        DungeonGenerator dg = new DungeonGenerator();
-        dungeon1 = dg.GenerateBattleRoom(17,17,true,true,true,true);
-        Map.addPiece(dungeon1);
-        canvas.addGameObject(dungeon1);
+        curMap = new Map(3, 3, canvas);
+        int[] startingPos = curMap.getStartingPos();
+        player.setX(startingPos[0]);
+        player.setY(startingPos[1]);
     }
 
     public void tick() {
         long currentTime = System.currentTimeMillis();
         long deltaTime = currentTime - lastFrameTime;
 
-        player.update(deltaTime);
+        player.update(deltaTime, curMap);
 
         lastFrameTime = currentTime;
     }

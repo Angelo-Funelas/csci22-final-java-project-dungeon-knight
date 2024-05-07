@@ -3,6 +3,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;;
 
 public class GameCanvas extends JComponent {                                      
@@ -11,7 +12,7 @@ public class GameCanvas extends JComponent {
     private ArrayList<GameObject> GameObjects;
     private Color backgroundColor;
     private GameObject target;
-    private double zoom = 3;
+    private double zoom = 0.8;
     
     public GameCanvas(int w, int h) {
         width = w;
@@ -34,15 +35,16 @@ public class GameCanvas extends JComponent {
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
+        Rectangle2D.Double bg = new Rectangle2D.Double(-width/2,-height/2,width*2,height*2);
+        g2d.setPaint(backgroundColor);
+        g2d.fill(bg);
+
         AffineTransform reset = g2d.getTransform();
         if (target != null) {
             g2d.translate((-target.getX()*zoom)+(width/2)-(target.getWidth()/2), (-target.getY()*zoom)+(height/2)-(target.getHeight()/2));
             g2d.scale(zoom, zoom);
         }
 
-        Rectangle2D.Double bg = new Rectangle2D.Double(-width/2,-height/2,width*2,height*2);
-        g2d.setPaint(backgroundColor);
-        g2d.fill(bg);
         synchronized (GameObjects) {
             for (GameObject object : GameObjects) {
                 object.draw(g2d);
@@ -54,6 +56,7 @@ public class GameCanvas extends JComponent {
     public void addGameObject(GameObject obj) {
         synchronized (GameObjects) {
             GameObjects.add(obj);
+            Collections.sort(GameObjects);
         }
     }
 }

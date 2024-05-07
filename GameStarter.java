@@ -9,8 +9,8 @@ public class GameStarter {
         GameFrame game = new GameFrame();
         game.setUpGUI();
         game.startAnimationThread();
-        game.prepareLevel();
         game.initPlayer();
+        game.prepareLevel();
         game.startGameLoop();
     }
 }

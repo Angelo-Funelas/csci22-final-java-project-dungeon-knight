@@ -8,7 +8,7 @@ import javax.sound.sampled.spi.MixerProvider;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
-    private int scale, width, height;
+    private int scale, width, height, zIndex;
     private double x,y,dx,dy;
     private boolean moveUp, moveDown, moveLeft, moveRight;
     private double acceleration, friction, maxSpeed, speedModifier;
@@ -31,6 +31,7 @@ public class Player implements GameObject, Entity {
         acceleration = 25;
         maxSpeed = 90;
         friction = 0.8;
+        zIndex = 3;
         width = sprite.getWidth();
         height = sprite.getHeight();
         collBoxes = new ArrayList<CollisionBox>();
@@ -40,6 +41,8 @@ public class Player implements GameObject, Entity {
 
     public double getX() {return x;}
     public double getY() {return y;}
+    public void setX(double x) {this.x = x;}
+    public void setY(double y) {this.y = y;}
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
@@ -54,7 +57,7 @@ public class Player implements GameObject, Entity {
         return sprite;
     }
     // sqrt((speed*speed)/2) = a
-    public void update(long dt) {
+    public void update(long dt, Map curMap) {
         if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
         if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
         if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
@@ -74,7 +77,7 @@ public class Player implements GameObject, Entity {
 
         boolean collidedX = false;
         boolean collidedY = false;
-        for (CollisionBox box : Map.getCollisionBoxes()) {
+        for (CollisionBox box : curMap.getCollisionBoxes()) {
             if (isColliding(box, dx, 0)) {
                 collidedX = true;
                 dx = 0;
@@ -112,6 +115,14 @@ public class Player implements GameObject, Entity {
 
     public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {
         return collBoxes.get(0).isColliding(other, offsetX, offsetY);
+    }
+
+    public int getZIndex() {
+        return zIndex;
+    }
+    @Override
+    public int compareTo(GameObject other) {
+        return Integer.compare(this.getZIndex(), other.getZIndex());
     }
 
 }

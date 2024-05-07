@@ -7,11 +7,11 @@ import javax.imageio.ImageIO;
 import java.util.Random;
 
 public class DungeonGenerator {
-    ArrayList<BufferedImage> mapList = new ArrayList<BufferedImage>();
-    private int doorTileWidth = 5;
-    private int doorWidth = doorTileWidth*16;
+    private static ArrayList<BufferedImage> mapList = new ArrayList<BufferedImage>();
 
-    public DungeonGenerator() {
+    private DungeonGenerator() {} // make an empty private constructor to prevent it from being instantiated
+
+    static { // initialize sprites
         ArrayList<File> spriteSrcs = new ArrayList<File>();
         spriteSrcs.add(new File("tiles/floor0.png"));
         spriteSrcs.add(new File("tiles/floor1.png"));
@@ -28,8 +28,10 @@ public class DungeonGenerator {
                 System.out.println("Can't find tiles");
             }
         }
-    }
-    public DungeonPiece GenerateBattleRoom(int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight) {
+    } // bridges - 21, 2 small - 26
+    public static DungeonPiece GenerateBattleRoom(int gridX, int gridY, int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight) {
+        int doorTileWidth = 5;
+        int doorWidth = doorTileWidth*16;
         int areaWidth = tileWidth*16;
         int areaHeight = (tileHeight*16)+16;
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
@@ -128,7 +130,7 @@ public class DungeonGenerator {
         }
 
         g2d.dispose();
-        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, areaWidth, areaHeight, collBoxes);
+        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, 1, areaWidth, areaHeight, gridX, gridY, collBoxes);
         return dungeon1Obj;
     }
 }

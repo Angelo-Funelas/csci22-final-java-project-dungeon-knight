@@ -1,9 +1,13 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 public class Map {
-    static ArrayList<DungeonPiece> mapPieces = new ArrayList<DungeonPiece>();
+    private ArrayList<DungeonPiece> mapPieces;
+    private GameCanvas canvas;
+    private int[] startingPos;
 
-    public static ArrayList<CollisionBox> getCollisionBoxes() {
+    public ArrayList<CollisionBox> getCollisionBoxes() {
         ArrayList<CollisionBox> res = new ArrayList<CollisionBox>();
         for (DungeonPiece piece : mapPieces) {
             res.addAll(piece.getCollisionBoxes());
@@ -11,7 +15,26 @@ public class Map {
         return res;
     }
 
-    public static void addPiece(DungeonPiece piece) {
+    public Map(int gridRods, int gridHeight, GameCanvas canvas) {
+        this.canvas = canvas;
+        mapPieces = new ArrayList<DungeonPiece>();
+        Random random = new Random();
+        int doorOpening = random.nextInt(4);
+        boolean[] doors = new boolean[4];
+        Arrays.fill(doors, false);
+        doors[doorOpening] = true;
+
+        DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0, 0, 17, 17, doors[0],doors[1],doors[2],doors[3]);
+        startingPos = starterRoom.getRoomCenter();
+        addPiece(starterRoom);
+        canvas.addGameObject(starterRoom);
+    }
+
+    public int[] getStartingPos() {
+        return startingPos;
+    }
+
+    public void addPiece(DungeonPiece piece) {
         mapPieces.add(piece);
     }
 }
