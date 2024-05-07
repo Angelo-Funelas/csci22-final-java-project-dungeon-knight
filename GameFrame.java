@@ -57,12 +57,12 @@ public class GameFrame implements KeyListener {
         player = new Player(26);
         canvas.addGameObject(player);
         AnimationThread.addSprite(player.getSprite());
-        canvas.focus(player);
+        // canvas.focus(player);
     }
 
     public void prepareLevel() {
         DungeonGenerator dg = new DungeonGenerator();
-        dungeon1 = dg.GenerateBattleRoom(23,23,0,0,0,0);
+        dungeon1 = dg.GenerateBattleRoom(10,10,0,0,0,0);
         Map.addPiece(dungeon1);
         canvas.addGameObject(dungeon1);
     }

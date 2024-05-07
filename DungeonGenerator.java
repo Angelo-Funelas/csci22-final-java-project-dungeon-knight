@@ -27,15 +27,15 @@ public class DungeonGenerator {
         }
     }
     public DungeonPiece GenerateBattleRoom(int tileWidth, int tileHeight, int doorUp, int doorDown, int doorLeft, int doorRight) {
-        int areaWidth = tileWidth*16; // Example area width
-        int areaHeight = (tileHeight*16)+16; // Example area height
+        int areaWidth = tileWidth*16;
+        int areaHeight = (tileHeight*16)+16;
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = combinedImage.createGraphics();
         ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
 
         // Generate Floor
-        for (int y = 1; y < 22; y++) {
-            for (int x = 1; x < 22; x++) {
+        for (int y = 1; y < tileHeight-1; y++) {
+            for (int x = 1; x < tileWidth-1; x++) {
                 int randomSpriteIndex;
                 Random random = new Random();
                 randomSpriteIndex = random.nextInt(2 + 1);
@@ -45,15 +45,15 @@ public class DungeonGenerator {
         }
         // randomSpriteIndex = random.nextInt(7 - 6 + 1) + 6;
         // Generate Walls
-        for (int y = 0; y < 23; y++) {
-            for (int x = 0; x < 23; x++) {
+        for (int y = 0; y < tileHeight; y++) {
+            for (int x = 0; x < tileWidth; x++) {
                 int randomSpriteIndex;
                 Random random = new Random();
                 randomSpriteIndex = random.nextInt(7 - 6 + 1) + 6;
                 BufferedImage randomSprite = mapList.get(randomSpriteIndex);
-                if (y>0&&y<22) {
+                if (y>0&&y<tileWidth-1) {
                     g2d.drawImage(randomSprite, 0, y*16, null);
-                    g2d.drawImage(randomSprite, 22*16, y*16, null);
+                    g2d.drawImage(randomSprite, (tileWidth-1)*16, y*16, null);
                     break;
                 } else {
                     g2d.drawImage(randomSprite, x * 16, y * 16, null);
@@ -80,7 +80,7 @@ public class DungeonGenerator {
         }
 
         g2d.dispose();
-        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, 368, 384, collBoxes);
+        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, areaWidth, areaHeight, collBoxes);
         return dungeon1Obj;
     }
 }
