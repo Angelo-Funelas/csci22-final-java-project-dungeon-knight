@@ -32,7 +32,7 @@ public class GameFrame implements KeyListener {
 
     private void connectToServer() {
         try {
-            socket = new Socket("localhost", 55555);
+            socket = new Socket("192.168.0.105", 55555);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 

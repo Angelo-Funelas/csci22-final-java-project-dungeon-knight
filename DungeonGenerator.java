@@ -29,7 +29,7 @@ public class DungeonGenerator {
             }
         }
     } // bridges - 21, 2 small - 26
-    public static DungeonPiece GenerateBattleRoom(int gridX, int gridY, int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight) {
+    public static DungeonPiece GenerateBattleRoom(int gridX, int gridY, int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight, int seed) {
         int doorTileWidth = 5;
         int doorWidth = doorTileWidth*16;
         int areaWidth = tileWidth*16;
@@ -37,12 +37,12 @@ public class DungeonGenerator {
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = combinedImage.createGraphics();
         ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
+        Random random = new Random(seed);
 
         // Generate Floor
         for (int y = 1; y < tileHeight-1; y++) {
             for (int x = 1; x < tileWidth-1; x++) {
                 int randomSpriteIndex;
-                Random random = new Random();
                 randomSpriteIndex = random.nextInt(2 + 1);
                 BufferedImage randomSprite = mapList.get(randomSpriteIndex);
                 g2d.drawImage(randomSprite, x * 16, y * 16+7, null);
@@ -53,7 +53,6 @@ public class DungeonGenerator {
         for (int y = 0; y < tileHeight; y++) {
             for (int x = 0; x < tileWidth; x++) {
                 int randomSpriteIndex;
-                Random random = new Random();
                 randomSpriteIndex = random.nextInt(7 - 6 + 1) + 6;
                 BufferedImage randomSprite = mapList.get(randomSpriteIndex);
                 BufferedImage retractedSpike = mapList.get(4);

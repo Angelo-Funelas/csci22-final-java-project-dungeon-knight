@@ -24,7 +24,7 @@ public class Map {
         Arrays.fill(doors, false);
         doors[doorOpening] = true;
 
-        DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0, 0, 17, 17, doors[0],doors[1],doors[2],doors[3]);
+        DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0, 0, 17, 17, doors[0],doors[1],doors[2],doors[3], 0);
         startingPos = starterRoom.getRoomCenter();
         addPiece(starterRoom);
         canvas.addGameObject(starterRoom);
