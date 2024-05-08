@@ -7,7 +7,7 @@ public class DrawThread extends Thread {
         this.c = c;
     }
     public void run() {
-        Timer timer = new Timer(30, new ActionListener() {
+        Timer timer = new Timer(1000/GameStarter.framerate, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 c.repaint();
