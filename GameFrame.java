@@ -53,47 +53,67 @@ public class GameFrame implements KeyListener {
 
     private class ReadFromServer implements Runnable {
         private DataInputStream dataIn;
+        private boolean readReady;
 
         public ReadFromServer(DataInputStream in) {
             dataIn = in;
+            readReady = true;
         }
 
         public void run() {
             while (true) {
-                try {
-                    String command = dataIn.readUTF();
-                    if (command.startsWith("com_")) {
-                        switch (command) {
-                            case "com_setID":
-                                clientID = dataIn.readInt();
-                                System.out.println("Connected to server as Client #" + clientID);
-                                break;
-                            case "com_newClient":
-                                int newClientId = dataIn.readInt();
-                                if (newClientId != clientID) {
-                                    Player ally = new Player(26);
-                                    canvas.addGameObject(ally);
-                                    AnimationThread.addSprite(ally.getSprite());
-                                    clients.put(newClientId, ally);
-                                }
-                                break;
-                            case "com_setAllyPos":
-                                int targetID = dataIn.readInt();
-                                double data_x = dataIn.readDouble();
-                                double data_y = dataIn.readDouble();
-                                System.out.println(data_x + " " + data_y);
-                                if (targetID!=clientID) {
-                                    Player targetAlly = clients.get(targetID);
-                                    if (targetAlly != null) {
-                                        targetAlly.setX(data_x);
-                                        targetAlly.setY(data_y);
+                if (readReady) {
+                    try {
+                        readReady = false;
+                        String command = dataIn.readUTF();
+                        if (command.startsWith("com_")) {
+                            switch (command) {
+                                case "com_setID":
+                                    clientID = dataIn.readInt();
+                                    System.out.println("Connected to server as Client #" + clientID);
+                                    break;
+                                case "com_newClient":
+                                    int newClientId = dataIn.readInt();
+                                    if (newClientId != clientID) {
+                                        Player ally = new Player(26, true);
+                                        canvas.addGameObject(ally);
+                                        AnimationThread.addSprite(ally.getSprite());
+                                        clients.put(newClientId, ally);
+                                        allies.add(ally);
                                     }
-                                }
-                                break;
+                                    break;
+                                case "com_setAllyPos":
+                                    int targetID = dataIn.readInt();
+                                    double data_x = dataIn.readDouble();
+                                    double data_y = dataIn.readDouble();
+                                    double data_dx = dataIn.readDouble();
+                                    double data_dy = dataIn.readDouble();
+                                    int data_faceDir = dataIn.readInt();
+                                    boolean data_isWalking = dataIn.readBoolean();
+                                    // System.out.println(data_x + " " + data_y);
+                                    // System.out.println(data_dx + " " + data_dy);
+                                    if (targetID!=clientID) {
+                                        Player targetAlly = clients.get(targetID);
+                                        if (targetAlly != null) {
+                                            targetAlly.setX(data_x);
+                                            targetAlly.setY(data_y);
+                                            targetAlly.setDx(data_dx);
+                                            targetAlly.setDy(data_dy);
+                                            if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
+                                            targetAlly.getSprite().setWalking(data_isWalking);;
+                                        }
+                                    }
+                                    break;
+                            }
+                        } else {
+                            try {
+                                while (dataIn.read() != -1) {}
+                            } catch (IOException e) {}
                         }
+                    } catch (IOException ex) {
+                        System.out.println("IOException from ReadFromServer Thread " + ex);
                     }
-                } catch (IOException ex) {
-                    System.out.println("IOException from ReadFromServer Thread");
+                    readReady = true;
                 }
             }
         }
@@ -111,6 +131,11 @@ public class GameFrame implements KeyListener {
                 dataOut.writeUTF("setPos");
                 dataOut.writeDouble(player.getX());
                 dataOut.writeDouble(player.getY());
+                dataOut.writeDouble(player.getDx());
+                dataOut.writeDouble(player.getDy());
+                dataOut.writeInt(player.getSprite().getFaceDir());
+                dataOut.writeBoolean(player.getSprite().isWalkingBool());
+                dataOut.flush();
             } catch (IOException ex) {
                 System.out.println("IOException at setPos");
             } 
@@ -120,7 +145,7 @@ public class GameFrame implements KeyListener {
             while (true) {
                 setPos();
                 try {
-                    Thread.sleep(25); // some delay for writing data
+                    Thread.sleep(50); // some delay for writing data
                 }
                 catch (InterruptedException ex) {
                     System.out.println("InterruptedException from WTS run()");
@@ -166,7 +191,7 @@ public class GameFrame implements KeyListener {
     }
 
     public void initPlayer() {
-        player = new Player(26);
+        player = new Player(26, false);
         canvas.addGameObject(player);
         AnimationThread.addSprite(player.getSprite());
         canvas.focus(player);
@@ -185,6 +210,9 @@ public class GameFrame implements KeyListener {
         long deltaTime = currentTime - lastFrameTime;
 
         player.update(deltaTime, curMap);
+        for (Player ally : allies) {
+            ally.update(deltaTime, curMap);
+        }
 
         lastFrameTime = currentTime;
     }

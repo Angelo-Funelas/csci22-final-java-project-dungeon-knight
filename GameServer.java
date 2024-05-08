@@ -9,6 +9,7 @@ public class GameServer {
     private ArrayList<Client> clients;
     private int maxClients = 4;
     private int port = 55555;
+    private static boolean emitAllReady;
 
     public GameServer() {
         System.out.println("==== Dungeon Knight Server ====");
@@ -19,6 +20,7 @@ public class GameServer {
             System.out.println("IOException from constructor");
         }
         clients = new ArrayList<Client>();
+        emitAllReady = true;
     }
 
     public static void main(String[] args) {
@@ -38,6 +40,11 @@ public class GameServer {
     }
 
     public void tick() {
+        // for (Client c : clients) {
+        //     double pX = c.getPlayer().getX();
+        //     double pY = c.getPlayer().getY();
+        //     System.out.println(pX + " " + pY);
+        // }
     }
 
     public void acceptConnections() {
@@ -63,9 +70,13 @@ public class GameServer {
         public Object getValue() {return value;}
     }
 
-    public void emitAll(String command, ArrayList<emitArg> args) {
-        for (Client c : clients) {
-            c.emit(command, args);
+    public synchronized void emitAll(String command, ArrayList<emitArg> args) {
+        if (emitAllReady) {
+            emitAllReady = false;
+            for (Client c : clients) {
+                c.emit(command, args);
+            }
+            emitAllReady = true;
         }
     }
 
@@ -82,15 +93,27 @@ public class GameServer {
         private ArrayList<Client> clients;
 
         private class Player {
-            private double x, y;
+            private double x, y, dx, dy;
+            private int faceDir;
+            private boolean isWalking;
             public Player() {
                 x = 0;
                 y = 0;
+                dx = 0;
+                dy = 0;
             }
             public double getX() {return x;}
             public double getY() {return y;}
             public void setX(double x) {this.x=x;}
             public void setY(double y) {this.y=y;}
+            public double getDx() {return dx;}
+            public double getDy() {return dy;}
+            public void setDx(double dx) {this.dx=dx;}
+            public void setDy(double dy) {this.dy=dy;}
+            public void setFaceDir(int dir) {faceDir = dir;}
+            public int getFaceDir() {return faceDir;}
+            public void setWalking(boolean isWalking) {this.isWalking = isWalking;}
+            public boolean getWalking() {return isWalking;}
         }
 
         public int getID() {return clientID;}
@@ -186,6 +209,10 @@ public class GameServer {
                         case "setPos":
                             c.getPlayer().setX(dataIn.readDouble());
                             c.getPlayer().setY(dataIn.readDouble());
+                            c.getPlayer().setDx(dataIn.readDouble());
+                            c.getPlayer().setDy(dataIn.readDouble());
+                            c.getPlayer().setFaceDir(dataIn.readInt());
+                            c.getPlayer().setWalking(dataIn.readBoolean());
                             break;
                     }
                 } catch (IOException ex) {
@@ -238,8 +265,12 @@ public class GameServer {
                         case "int":
                             dataOut.writeInt((int)arg.getValue());
                             break;
+                        case "boolean":
+                            dataOut.writeBoolean((boolean)arg.getValue());
+                            break;
                     }
                 }
+                dataOut.flush();
             } catch (IOException ex) {
                 System.out.println("IOException at sendClientID");
             } 
@@ -254,16 +285,24 @@ public class GameServer {
         public void run() {
             while (!stopped) {
                 for (Client c : clients) {
-                    double px = c.getPlayer().getX();
-                    double py = c.getPlayer().getY();
+                    double pX = c.getPlayer().getX();
+                    double pY = c.getPlayer().getY();
+                    double pDx = c.getPlayer().getDx();
+                    double pDy = c.getPlayer().getDy();
+                    int pFaceDir = c.getPlayer().getFaceDir();
+                    boolean isWalking = c.getPlayer().getWalking();
                     ArrayList<emitArg> args = new ArrayList<emitArg>();
                     args.add(new emitArg("int", c.getID()));
-                    args.add(new emitArg("double", px));
-                    args.add(new emitArg("double", py));
+                    args.add(new emitArg("double", pX));
+                    args.add(new emitArg("double", pY));
+                    args.add(new emitArg("double", pDx));
+                    args.add(new emitArg("double", pDy));
+                    args.add(new emitArg("int", pFaceDir));
+                    args.add(new emitArg("boolean", isWalking));
                     emitAll("setAllyPos", args);
                 }
                 try {
-                    Thread.sleep(100); // some delay for writing data
+                    Thread.sleep(25); // some delay for writing data
                 }
                 catch (InterruptedException ex) {
                     System.out.println("InterruptedException from WTS run()");

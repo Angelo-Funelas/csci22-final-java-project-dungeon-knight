@@ -10,11 +10,11 @@ public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex;
     private double x,y,dx,dy;
-    private boolean moveUp, moveDown, moveLeft, moveRight;
+    private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed, speedModifier;
     private ArrayList<CollisionBox> collBoxes;
 
-    public Player(int scale) {
+    public Player(int scale, boolean ally) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         sprite_frames.add(new File("sprites/rogue_frame_0.png"));
         sprite_frames.add(new File("sprites/rogue_frame_1.png"));
@@ -26,11 +26,14 @@ public class Player implements GameObject, Entity {
         sprite_frames.add(new File("sprites/rogue_frame_7.png"));
         sprite = new Sprite(sprite_frames, 2);
         this.scale = scale;
+        this.ally = ally;
         x = 80.5;
         y = 80.5;
+        dx = 0;
+        dy = 0;
         acceleration = 25;
         maxSpeed = 90;
-        friction = 0.8;
+        this.friction = 0.8;
         zIndex = 3;
         width = sprite.getWidth();
         height = sprite.getHeight();
@@ -41,8 +44,12 @@ public class Player implements GameObject, Entity {
 
     public double getX() {return x;}
     public double getY() {return y;}
+    public double getDx() {return dx;}
+    public double getDy() {return dy;}
     public void setX(double x) {this.x = x;}
     public void setY(double y) {this.y = y;}
+    public void setDx(double dx) {this.dx = dx;}
+    public void setDy(double dy) {this.dy = dy;}
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
@@ -58,43 +65,49 @@ public class Player implements GameObject, Entity {
     }
     // sqrt((speed*speed)/2) = a
     public void update(long dt, Map curMap) {
-        if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
-        if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
-        if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
-        if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
-
-        double cur_maxSpeed = maxSpeed;
-        if ((moveUp || moveDown) && (moveLeft || moveRight) && !(moveUp && moveDown) && !(moveLeft && moveRight)) {
-            cur_maxSpeed = Math.sqrt(cur_maxSpeed*cur_maxSpeed/2);
-        }
-        cur_maxSpeed *= dt / 1000.0;
-        if (moveUp||moveDown||moveLeft||moveRight) {sprite.setWalking(true);} else {sprite.setWalking(false);}
-
-        dx = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dx));
-        dy = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dy));
-        dx *= friction;
-        dy *= friction;
-
-        boolean collidedX = false;
-        boolean collidedY = false;
-        for (CollisionBox box : curMap.getCollisionBoxes()) {
-            if (isColliding(box, dx, 0)) {
-                collidedX = true;
-                dx = 0;
+        if (!ally) {
+            if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
+            if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
+            if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
+            if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
+    
+            double cur_maxSpeed = maxSpeed;
+            if ((moveUp || moveDown) && (moveLeft || moveRight) && !(moveUp && moveDown) && !(moveLeft && moveRight)) {
+                cur_maxSpeed = Math.sqrt(cur_maxSpeed*cur_maxSpeed/2);
             }
-            if (isColliding(box, 0, dy)) {
-                collidedY = true;
-                dy = 0;
+            cur_maxSpeed *= dt / 1000.0;
+            if (moveUp||moveDown||moveLeft||moveRight) {sprite.setWalking(true);} else {sprite.setWalking(false);}
+    
+            dx = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dx));
+            dy = Math.max(-cur_maxSpeed, Math.min(cur_maxSpeed, dy));
+            dx *= friction;
+            dy *= friction;
+            boolean collidedX = false;
+            boolean collidedY = false;
+            for (CollisionBox box : curMap.getCollisionBoxes()) {
+                if (isColliding(box, dx, 0)) {
+                    collidedX = true;
+                    dx = 0;
+                }
+                if (isColliding(box, 0, dy)) {
+                    collidedY = true;
+                    dy = 0;
+                }
             }
-        }
-        if (!collidedX) {
+            if (!collidedX) {
+                x += dx;
+            }
+            if (!collidedY) {
+                y += dy;
+            }
+            collBoxes.get(0).setPos(x+4,y+5);
+        } else {
+            dx *= friction;
+            dy *= friction;
             x += dx;
-        }
-        if (!collidedY) {
             y += dy;
         }
 
-        collBoxes.get(0).setPos(x+4,y+5);
     }
 
     public void setUp(boolean b) {moveUp = b;}

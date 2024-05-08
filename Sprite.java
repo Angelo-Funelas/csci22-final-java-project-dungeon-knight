@@ -55,5 +55,6 @@ public class Sprite {
     public void faceRight() {faceDir = 1;}
     public int getWidth() {return width;}
     public int getHeight() {return height;}
-    
+    public int getFaceDir() {return faceDir;}
+    public boolean isWalkingBool() {return isWalking;}
 }
