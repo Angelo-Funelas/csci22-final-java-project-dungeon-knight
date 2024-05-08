@@ -51,6 +51,17 @@ public class GameFrame implements KeyListener {
         }
     }
 
+    public void newClient(int id) {
+        int newClientId = id;
+        if (newClientId != clientID) {
+            Player ally = new Player(26, true);
+            canvas.addGameObject(ally);
+            AnimationThread.addSprite(ally.getSprite());
+            clients.put(newClientId, ally);
+            allies.add(ally);
+        }
+    }
+
     private class ReadFromServer implements Runnable {
         private DataInputStream dataIn;
         private boolean readReady;
@@ -72,16 +83,6 @@ public class GameFrame implements KeyListener {
                                     clientID = dataIn.readInt();
                                     System.out.println("Connected to server as Client #" + clientID);
                                     break;
-                                case "com_newClient":
-                                    int newClientId = dataIn.readInt();
-                                    if (newClientId != clientID) {
-                                        Player ally = new Player(26, true);
-                                        canvas.addGameObject(ally);
-                                        AnimationThread.addSprite(ally.getSprite());
-                                        clients.put(newClientId, ally);
-                                        allies.add(ally);
-                                    }
-                                    break;
                                 case "com_setAllyPos":
                                     int targetID = dataIn.readInt();
                                     double data_x = dataIn.readDouble();
@@ -101,6 +102,8 @@ public class GameFrame implements KeyListener {
                                             targetAlly.setDy(data_dy);
                                             if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
                                             targetAlly.getSprite().setWalking(data_isWalking);;
+                                        } else {
+                                            newClient(targetID);
                                         }
                                     }
                                     break;

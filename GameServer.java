@@ -144,9 +144,6 @@ public class GameServer {
             clientID = totalClientCount;
             totalClientCount++;
             this.clients = clients;
-            ArrayList<emitArg> args = new ArrayList<emitArg>();
-            args.add(new emitArg("int", clientID));
-            emitAll("newClient", args);
             try {
                 inputStream = new DataInputStream(s.getInputStream());
                 outputStream = new DataOutputStream(s.getOutputStream());
