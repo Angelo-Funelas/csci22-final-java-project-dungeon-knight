@@ -147,7 +147,7 @@ public class GameFrame implements KeyListener {
             while (true) {
                 setPos();
                 try {
-                    Thread.sleep(50); // some delay for writing data
+                    Thread.sleep(40); // some delay for writing data
                 }
                 catch (InterruptedException ex) {
                     System.out.println("InterruptedException from WTS run()");
