@@ -154,8 +154,8 @@ public class GameServer {
                 wtc.sendClientID();
                 player = new Player();
 
-                Thread readThread = new Thread(rfc); 
-                Thread writeThread = new Thread(wtc);
+                readThread = new Thread(rfc); 
+                writeThread = new Thread(wtc);
                 
                 readThread.start();
                 writeThread.start();
@@ -187,10 +187,6 @@ public class GameServer {
             maxExceptions = 8;
             System.out.println("RFC" + playerID + " Runnable created!");
             stopped = false;
-        }
-
-        public void close() {
-            try {dataIn.close();} catch (IOException ex) {System.out.println("error trying to close dataIn");}
         }
         
         public void stopThread() {
@@ -233,11 +229,9 @@ public class GameServer {
     private class WriteToClient implements Runnable {
         private int playerID;
         private DataOutputStream dataOut;
-        Client c;
         private boolean stopped;
 
         public WriteToClient(Client c, DataOutputStream out) {
-            this.c = c;
             playerID = c.getID();
             dataOut = out;
             stopped = false;

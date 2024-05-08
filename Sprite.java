@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import javax.imageio.*;
-import javax.sound.midi.SysexMessage;
 
 public class Sprite {
     private ArrayList<BufferedImage> frames;

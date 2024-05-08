@@ -1,10 +1,8 @@
 import java.awt.*;
 import java.awt.geom.*;
 import javax.swing.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;;
 
 public class GameCanvas extends JComponent {                                      
     private int width;

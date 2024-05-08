@@ -27,7 +27,7 @@ public class Map {
         DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0, 0, 17, 17, doors[0],doors[1],doors[2],doors[3], 0);
         startingPos = starterRoom.getRoomCenter();
         addPiece(starterRoom);
-        canvas.addGameObject(starterRoom);
+        this.canvas.addGameObject(starterRoom);
     }
 
     public int[] getStartingPos() {

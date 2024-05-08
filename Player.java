@@ -2,16 +2,13 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.awt.*;
-import java.awt.image.*;
-import javax.imageio.*;
-import javax.sound.sampled.spi.MixerProvider;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex;
     private double x,y,dx,dy;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
-    private double acceleration, friction, maxSpeed, speedModifier;
+    private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
 
     public Player(int scale, boolean ally) {
