@@ -29,7 +29,7 @@ public class DungeonGenerator {
             }
         }
     } // bridges - 21, 2 small - 26
-    public static DungeonPiece GenerateBattleRoom(int gridX, int gridY, int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight, int seed) {
+    public static DungeonRoom GenerateBattleRoom(int gridX, int gridY, int tileWidth, int tileHeight, boolean doorUp, boolean doorDown, boolean doorLeft, boolean doorRight, Random random) {
         int doorTileWidth = 5;
         int doorWidth = doorTileWidth*16;
         int areaWidth = tileWidth*16;
@@ -37,7 +37,6 @@ public class DungeonGenerator {
         BufferedImage combinedImage = new BufferedImage(areaWidth, areaHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = combinedImage.createGraphics();
         ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
-        Random random = new Random(seed);
 
         // Generate Floor
         for (int y = 1; y < tileHeight-1; y++) {
@@ -129,7 +128,11 @@ public class DungeonGenerator {
         }
 
         g2d.dispose();
-        DungeonPiece dungeon1Obj = new DungeonPiece(combinedImage, 1, areaWidth, areaHeight, gridX, gridY, collBoxes);
+        DungeonRoom dungeon1Obj = new DungeonRoom(combinedImage, 1, areaWidth, areaHeight, gridX, gridY, collBoxes);
         return dungeon1Obj;
     }
+
+    // public static DungeonRoom GenerateHorizontalHallway(int tileWidth, int tileHeight) {
+
+    // }
 }

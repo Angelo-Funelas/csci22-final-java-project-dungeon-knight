@@ -15,16 +15,16 @@ public class Map {
         return res;
     }
 
-    public Map(int gridRods, int gridHeight, GameCanvas canvas) {
+    public Map(int gridRods, int gridHeight, GameCanvas canvas, int seed) {
         this.canvas = canvas;
         mapPieces = new ArrayList<DungeonPiece>();
-        Random random = new Random();
+        Random random = new Random(seed);
         int doorOpening = random.nextInt(4);
         boolean[] doors = new boolean[4];
         Arrays.fill(doors, false);
         doors[doorOpening] = true;
 
-        DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0, 0, 17, 17, doors[0],doors[1],doors[2],doors[3], 0);
+        DungeonPiece starterRoom = DungeonGenerator.GenerateBattleRoom(0-(17*16/2), 0-(17*16/2), 17, 17, doors[0],doors[1],doors[2],doors[3], random);
         startingPos = starterRoom.getRoomCenter();
         addPiece(starterRoom);
         this.canvas.addGameObject(starterRoom);

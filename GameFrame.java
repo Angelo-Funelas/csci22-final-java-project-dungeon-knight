@@ -203,10 +203,10 @@ public class GameFrame implements KeyListener {
     }
 
     public void prepareLevel() {
-        curMap = new Map(3, 3, canvas);
+        curMap = new Map(3, 3, canvas, 0);
         int[] startingPos = curMap.getStartingPos();
-        player.setX(startingPos[0]);
-        player.setY(startingPos[1]);
+        player.setX(0);
+        player.setY(0);
     }
 
     public void tick() {
@@ -214,8 +214,10 @@ public class GameFrame implements KeyListener {
         long deltaTime = currentTime - lastFrameTime;
 
         player.update(deltaTime, curMap);
-        for (Player ally : allies) {
-            ally.update(deltaTime, curMap);
+        if (allies != null) {
+            for (Player ally : allies) {
+                ally.update(deltaTime, curMap);
+            }
         }
 
         lastFrameTime = currentTime;

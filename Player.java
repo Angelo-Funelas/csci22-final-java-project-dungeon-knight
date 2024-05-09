@@ -10,6 +10,7 @@ public class Player implements GameObject, Entity {
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
+    private Color debugColor = new Color(255, 0, 0, 255);
 
     public Player(int scale, boolean ally) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -51,6 +52,9 @@ public class Player implements GameObject, Entity {
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
         if (GameStarter.debugMode) {
+            g2d.setPaint(debugColor);
+            g2d.drawString("X: " + (int)x, (int)x, (int)y-8);
+            g2d.drawString("Y: " + (int)y, (int)x, (int)y-2);
             for (CollisionBox box : collBoxes) {
                 box.draw(g2d);
             }

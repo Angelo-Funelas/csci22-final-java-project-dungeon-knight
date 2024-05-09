@@ -20,6 +20,7 @@ public class GameCanvas extends JComponent {
         DrawThread drawThread = new DrawThread(this);
         drawThread.start();
         backgroundColor = new Color(5, 31, 41,255);
+        setFont(new Font("Arial", Font.PLAIN, 6)); 
     }
 
     public void focus(GameObject obj) {
