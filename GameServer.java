@@ -214,6 +214,7 @@ public class GameServer {
                     if (consequentExceptions>maxExceptions) {
                         System.out.println("Exceeded maxexceptions, disconnecting client");
                         c.disconnectClient();
+
                     }
                     try {
                         Thread.sleep(25); // some delay for writing data
@@ -224,6 +225,10 @@ public class GameServer {
                 }
             }
         }
+    }
+
+    public void generateMap() {
+        
     }
 
     private class WriteToClient implements Runnable {
@@ -263,7 +268,7 @@ public class GameServer {
                 }
                 dataOut.flush();
             } catch (IOException ex) {
-                System.out.println("IOException at sendClientID");
+                System.out.println("IOException at sendCommand");
             } 
         }
 

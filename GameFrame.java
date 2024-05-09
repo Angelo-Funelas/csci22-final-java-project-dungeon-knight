@@ -50,10 +50,12 @@ public class GameFrame implements KeyListener {
         }
     }
 
-    public void newClient(int id) {
+    public void newClient(int id, double x, double y) {
         int newClientId = id;
         if (newClientId != clientID) {
             Player ally = new Player(26, true);
+            ally.setX(x);
+            ally.setY(y);
             canvas.addGameObject(ally);
             AnimationThread.addSprite(ally.getSprite());
             clients.put(newClientId, ally);
@@ -102,7 +104,7 @@ public class GameFrame implements KeyListener {
                                             if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
                                             targetAlly.getSprite().setWalking(data_isWalking);;
                                         } else {
-                                            newClient(targetID);
+                                            newClient(targetID, data_x, data_y);
                                         }
                                     }
                                     break;
