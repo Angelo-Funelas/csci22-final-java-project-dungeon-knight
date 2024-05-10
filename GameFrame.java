@@ -31,7 +31,7 @@ public class GameFrame implements KeyListener {
 
     private void connectToServer() {
         try {
-            socket = new Socket("192.168.0.105", 55555);
+            socket = new Socket("gemplo.com", 55555);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
@@ -149,7 +149,7 @@ public class GameFrame implements KeyListener {
             while (true) {
                 setPos();
                 try {
-                    Thread.sleep(40); // some delay for writing data
+                    Thread.sleep(25); // some delay for writing data
                 }
                 catch (InterruptedException ex) {
                     System.out.println("InterruptedException from WTS run()");
