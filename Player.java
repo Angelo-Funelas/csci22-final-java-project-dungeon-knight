@@ -29,10 +29,10 @@ public class Player implements GameObject, Entity {
         y = 80.5;
         dx = 0;
         dy = 0;
-        acceleration = 25;
-        maxSpeed = 90;
+        acceleration = 30;
+        maxSpeed = 200;
         this.friction = 0.8;
-        zIndex = 3;
+        zIndex = 1000000;
         width = sprite.getWidth();
         height = sprite.getHeight();
         collBoxes = new ArrayList<CollisionBox>();

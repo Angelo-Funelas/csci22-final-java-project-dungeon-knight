@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class GameFrame implements KeyListener {
     private JFrame frame;
-    static int canvasWidth = 800;
+    static int canvasWidth = 1067;
     static int canvasHeight = 600;
     private GameCanvas canvas;
     private AnimationThread AnimationThread;
@@ -201,10 +201,8 @@ public class GameFrame implements KeyListener {
         canvas.focus(player);
         connectToServer();
     }
-
     public void prepareLevel() {
         curMap = new Map(3, 3, canvas, 0);
-        int[] startingPos = curMap.getStartingPos();
         player.setX(0);
         player.setY(0);
     }
