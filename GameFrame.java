@@ -144,7 +144,7 @@ public class GameFrame implements KeyListener {
                                         Player targetAlly = clients.get(targetID);
                                         if (targetAlly != null) {
                                             targetAlly.ping();
-                                            if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y) {
+                                            if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y||targetAlly.getWeapon().getAngle()!=data_angle) {
                                                 targetAlly.setX(data_x);
                                                 targetAlly.setY(data_y);
                                                 targetAlly.setDx(data_dx);
@@ -152,8 +152,6 @@ public class GameFrame implements KeyListener {
                                                 if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
                                                 targetAlly.getSprite().setWalking(data_isWalking);;
                                                 targetAlly.getWeapon().setAngle(data_angle);
-                                                targetAlly.setlX(data_x);
-                                                targetAlly.setlY(data_y);
                                             }
                                         } else {
                                             newClient(targetID, data_x, data_y);

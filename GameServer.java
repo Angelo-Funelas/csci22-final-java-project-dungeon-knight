@@ -17,7 +17,7 @@ public class GameServer {
             ss = new ServerSocket(port);
             System.out.println("Starter server on port " + port);
         } catch (IOException ex) {
-            System.out.println("IOException from constructor");
+            System.out.println("IOException from constructor: "+ex);
         }
         clients = new ArrayList<Client>();
         emitAllReady = true;

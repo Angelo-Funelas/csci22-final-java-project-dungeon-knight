@@ -6,7 +6,7 @@ public class RangedWeap extends Weapon implements GameObject {
     private double rateOfFire, bulletSpeed; // per second
     private Sprite sprite;
     private int width, height, zIndex, xOffset;
-    private double x,y;
+    private double x,y,lastAngle;
     private Player parent;
     private boolean ally;
     private GameCanvas canvas;
@@ -41,7 +41,8 @@ public class RangedWeap extends Weapon implements GameObject {
     public int getWidth() {return width;}
     public int getHeight() {return height;}
     public int getZIndex() {return zIndex;}
-    public void setAngle(double angle) {this.angle = angle;}
+    public void setAngle(double angle) {this.angle = angle; lastAngle = angle;}
+    public double getlAngle() {return lastAngle;}
     public double getAngle() {return angle;}
     public ArrayList<CollisionBox> getCollisionBoxes() {return null;}
     public boolean isColliding(CollisionBox other) {return false;}

@@ -6,7 +6,7 @@ import java.awt.*;
 public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex,curWeapon_i;
-    private double x,y,dx,dy, lastx, lasty;
+    private double x,y,dx,dy, lastx,lasty;
     private long lastPing;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed;
@@ -64,10 +64,8 @@ public class Player implements GameObject, Entity {
     public double getlY() {return lasty;}
     public double getDx() {return dx;}
     public double getDy() {return dy;}
-    public void setX(double x) {this.x = x;}
-    public void setY(double y) {this.y = y;}
-    public void setlX(double lastx) {this.lastx = lastx;}
-    public void setlY(double lasty) {this.lasty = lasty;}
+    public void setX(double x) {this.x = x; lastx = x;}
+    public void setY(double y) {this.y = y; lasty = y;}
     public void setDx(double dx) {this.dx = dx;}
     public void setDy(double dy) {this.dy = dy;}
     public Weapon getWeapon() {return weapons.get(curWeapon_i);}
