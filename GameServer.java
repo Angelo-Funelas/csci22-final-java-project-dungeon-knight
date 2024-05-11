@@ -220,7 +220,7 @@ public class GameServer {
                         }
                     }
                 } catch (IOException ex) {
-                    System.out.println("IOException from ReadFromServer Thread");
+                    System.out.println("IOException from ReadFromServer Thread: " + ex);
                     consequentExceptions++;
                     if (consequentExceptions>maxExceptions) {
                         System.out.println("Exceeded maxexceptions, disconnecting client");
