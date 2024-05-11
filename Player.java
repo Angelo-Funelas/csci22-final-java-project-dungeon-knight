@@ -11,6 +11,7 @@ public class Player implements GameObject, Entity {
     private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
     private Color debugColor = new Color(255, 0, 0, 255);
+    private ArrayList<GameObject> weapons;
 
     public Player(int scale, boolean ally) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -38,6 +39,8 @@ public class Player implements GameObject, Entity {
         collBoxes = new ArrayList<CollisionBox>();
         CollisionBox collBox = new CollisionBox(x, y, width-8, height-6);
         collBoxes.add(collBox);
+        weapons = new ArrayList<GameObject>();
+        weapons.add(new RangedWeap("badPistol", this));
     }
 
     public double getX() {return x;}
@@ -51,6 +54,9 @@ public class Player implements GameObject, Entity {
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
+        for (GameObject weapon : weapons) {
+            weapon.draw(g2d);
+        }
         if (GameStarter.debugMode) {
             g2d.setPaint(debugColor);
             g2d.drawString("X: " + (int)x, (int)x, (int)y-8);

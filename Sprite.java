@@ -12,7 +12,7 @@ public class Sprite {
     private int width, height;
     private int faceDir = 1;
     private boolean isWalking;
-    private double maxJumpHeight;
+    private double maxJumpHeight, jheight;
 
     public Sprite(ArrayList<File> frames, double maxJumpHeight) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
@@ -30,21 +30,23 @@ public class Sprite {
         height = cur_sprite.getHeight();
         this.maxJumpHeight = maxJumpHeight;
     }
+    public double getJheight() {
+        return jheight;
+    }
     public void update() {
         sprite_i = (sprite_i+=1)%frames.size();
         cur_sprite = frames.get(sprite_i);
+        if (isWalking) {
+            jheight = (maxJumpHeight/2)*(Math.sin(2*Math.PI*((sprite_i)-1.75)/7))+(maxJumpHeight/2);
+        } else {
+            jheight = 0;
+        }
     }
     public void setWalking(boolean b) {isWalking = b;}
     public void draw(Graphics2D g2d, int scale, double x, double y) {
         AffineTransform reset = g2d.getTransform();
         if (faceDir == -1) {
             x += width;
-        }
-        double jheight;
-        if (isWalking) {
-            jheight = (maxJumpHeight/2)*(Math.sin(2*Math.PI*((sprite_i)-1.75)/7))+(maxJumpHeight/2);
-        } else {
-            jheight = 0;
         }
         g2d.translate(x, y-jheight);
         g2d.drawImage(cur_sprite, 0, 0, scale*faceDir, scale, null);

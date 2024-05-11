@@ -31,7 +31,7 @@ public class GameFrame implements KeyListener {
 
     private void connectToServer() {
         try {
-            socket = new Socket("gemplo.com", 55555);
+            socket = new Socket("localhost", 55555);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
@@ -202,7 +202,7 @@ public class GameFrame implements KeyListener {
         connectToServer();
     }
     public void prepareLevel() {
-        curMap = new Map(3, 3, canvas, 15);
+        curMap = new Map(3, 3, canvas, 123456789);
         player.setX(0);
         player.setY(0);
     }

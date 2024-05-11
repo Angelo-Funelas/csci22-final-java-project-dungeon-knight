@@ -71,12 +71,14 @@ public class GameServer {
     }
 
     public synchronized void emitAll(String command, ArrayList<emitArg> args) {
-        if (emitAllReady) {
-            emitAllReady = false;
-            for (Client c : clients) {
-                c.emit(command, args);
+        synchronized (clients) {
+            if (emitAllReady) {
+                emitAllReady = false;
+                for (Client c : clients) {
+                    c.emit(command, args);
+                }
+                emitAllReady = true;
             }
-            emitAllReady = true;
         }
     }
 

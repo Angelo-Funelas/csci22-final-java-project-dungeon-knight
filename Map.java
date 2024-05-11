@@ -144,7 +144,7 @@ public class Map {
         // this.canvas.addGameObject(starterRoom);
         // 16 between 27, 27, 17, 13
 
-        int maxDepth = 4;
+        int maxDepth = 3;
         int gridSize = 1+maxDepth*2;
         ArrayList<ArrayList<mapModelPiece>> mapGrid = new ArrayList<ArrayList<mapModelPiece>>();
 

@@ -10,7 +10,7 @@ public class GameCanvas extends JComponent {
     private ArrayList<GameObject> GameObjects;
     private Color backgroundColor;
     private GameObject target;
-    private double zoom = 0.2;
+    private double zoom;
     
     public GameCanvas(int w, int h) {
         width = w;
@@ -20,7 +20,8 @@ public class GameCanvas extends JComponent {
         DrawThread drawThread = new DrawThread(this);
         drawThread.start();
         backgroundColor = new Color(5, 31, 41,255);
-        setFont(new Font("Arial", Font.PLAIN, 6)); 
+        setFont(new Font("Arial", Font.PLAIN, 6));
+        zoom = GameStarter.zoom;
     }
 
     public void focus(GameObject obj) {
