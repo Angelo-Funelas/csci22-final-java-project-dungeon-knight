@@ -7,6 +7,7 @@ public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex,curWeapon_i;
     private double x,y,dx,dy, lastx, lasty;
+    private long lastPing;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
@@ -50,6 +51,11 @@ public class Player implements GameObject, Entity {
         canvas.addGameObject(this);
         this.frame = frame;
         frame.addEntity(this);
+        lastPing = System.currentTimeMillis();
+    }
+
+    public void ping() {
+        lastPing = System.currentTimeMillis();
     }
 
     public double getX() {return x;}
@@ -128,6 +134,11 @@ public class Player implements GameObject, Entity {
             dy *= friction;
             x += dx;
             y += dy;
+            long currentTime = System.currentTimeMillis();
+            if (currentTime-lastPing>5*1000) {
+                canvas.removeGameObject(this);
+                frame.removeEntity(this);
+            }
         }
         for (Weapon weapon : weapons) {
             weapon.update(dt);

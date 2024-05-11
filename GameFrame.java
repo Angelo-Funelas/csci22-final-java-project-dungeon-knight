@@ -139,6 +139,7 @@ public class GameFrame implements KeyListener {
                                     if (targetID!=clientID) {
                                         Player targetAlly = clients.get(targetID);
                                         if (targetAlly != null) {
+                                            targetAlly.ping();;
                                             if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y) {
                                                 targetAlly.setX(data_x);
                                                 targetAlly.setY(data_y);
@@ -174,10 +175,7 @@ public class GameFrame implements KeyListener {
                     } catch (IOException ex) {
                         System.out.println("IOException from ReadFromServer Thread " + ex);
                         consequentExceptions++;
-                        try {
-                            Thread.sleep(1000); // some delay for writing data
-                        }
-                        catch (InterruptedException exc) {}
+                        try {Thread.sleep(1000);} catch (InterruptedException exc) {}
                         if (consequentExceptions>maxExceptions) {
                             disconnect();
                             connectToServer();
