@@ -30,7 +30,7 @@ public class RangedWeap extends Weapon implements GameObject {
         this.ally = ally;
         this.angle = 0;
         lastAttackTime = 0;
-        bulletSpeed = 300;
+        bulletSpeed = 400;
         this.canvas = canvas;
         rateOfFire = 2;
         this.frame = frame;

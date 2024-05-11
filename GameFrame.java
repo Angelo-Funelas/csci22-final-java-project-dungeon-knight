@@ -258,10 +258,12 @@ public class GameFrame implements KeyListener {
         }
     }
     public void handleEntityQueue() {
-        for (Entity en : entityQueue) {
-            addEntity(en);
+        if (addEntitySafe) {
+            for (Entity en : entityQueue) {
+                addEntity(en);
+            }
+            entityQueue.clear();
         }
-        entityQueue.clear();
     }
     public void removeEntity(Entity en) {
         if (addEntitySafe) {
@@ -273,10 +275,12 @@ public class GameFrame implements KeyListener {
         }
     }
     public void handleEntityRemoveQueue() {
-        for (Entity en : entityRemoveQueue) {
-            entities.remove(en);
+        if (addEntitySafe) {
+            for (Entity en : entityRemoveQueue) {
+                entities.remove(en);
+            }
+            entityRemoveQueue.clear();
         }
-        entityRemoveQueue.clear();
     }
 
     public void tick() {
@@ -294,7 +298,6 @@ public class GameFrame implements KeyListener {
         }
         handleEntityQueue();
         handleEntityRemoveQueue();
-
 
         lastFrameTime = currentTime;
     }

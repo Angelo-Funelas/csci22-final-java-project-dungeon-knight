@@ -312,7 +312,7 @@ public class GameServer {
                     emitAll("setAllyPos", args, c.getID());
                 }
                 try {
-                    Thread.sleep(100); // some delay for writing data
+                    Thread.sleep(50); // some delay for writing data
                 }
                 catch (InterruptedException ex) {
                     System.out.println("InterruptedException from WTS run()");
