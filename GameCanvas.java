@@ -13,12 +13,9 @@ public class GameCanvas extends JComponent {
     private Color backgroundColor;
     private GameObject target;
     private double zoom;
-    private static double mouseX, mouseY, translateX, translateY;
     
-    public static double getMouseX() {return mouseX;};
-    public static double getMouseY() {return mouseY;};
-    public static double getTranslateX() {return translateX;};
-    public static double getTranslateY() {return translateY;};
+    public static double mouseX, mouseY, translateX, translateY;
+    public static boolean isLeftButtonPressed;
     
     public GameCanvas(int w, int h) {
         width = w;
@@ -32,12 +29,33 @@ public class GameCanvas extends JComponent {
         zoom = GameStarter.zoom;
         translateX = 0;
         translateY = 0;
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    isLeftButtonPressed = true;
+                    System.out.println("Left Mouse Button Pressed");
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    isLeftButtonPressed = false;
+                    System.out.println("Left Mouse Button Released");
+                }
+            }
+        });
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                Point componentCoords = SwingUtilities.convertPoint(GameCanvas.this, e.getPoint(), GameCanvas.this);
-                mouseX = componentCoords.x;
-                mouseY = componentCoords.y;
+                mouseX = e.getX();
+                mouseY = e.getY();
+            }
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
             }
         });
     }
@@ -77,6 +95,14 @@ public class GameCanvas extends JComponent {
         synchronized (GameObjects) {
             GameObjects.add(obj);
             Collections.sort(GameObjects);
+        }
+    }
+
+    public void tickObjects(long dt) {
+        synchronized (GameObjects) {
+            for (GameObject object : GameObjects) {
+                object.update(dt);
+            }
         }
     }
 }

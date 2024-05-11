@@ -1,5 +1,3 @@
-import java.io.IOError;
-
 public class GameStarter {
     public static boolean debugMode;
     public static double zoom;

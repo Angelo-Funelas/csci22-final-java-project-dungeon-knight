@@ -12,8 +12,10 @@ public class Player implements GameObject, Entity {
     private ArrayList<CollisionBox> collBoxes;
     private Color debugColor = new Color(255, 0, 0, 255);
     private ArrayList<Weapon> weapons;
+    private GameCanvas canvas;
+    private GameFrame frame;
 
-    public Player(int scale, boolean ally) {
+    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         sprite_frames.add(new File("sprites/rogue_frame_0.png"));
         sprite_frames.add(new File("sprites/rogue_frame_1.png"));
@@ -23,11 +25,12 @@ public class Player implements GameObject, Entity {
         sprite_frames.add(new File("sprites/rogue_frame_5.png"));
         sprite_frames.add(new File("sprites/rogue_frame_6.png"));
         sprite_frames.add(new File("sprites/rogue_frame_7.png"));
-        sprite = new Sprite(sprite_frames, 2);
+        sprite = new Sprite(sprite_frames);
         this.scale = scale;
         this.ally = ally;
-        x = 80.5;
-        y = 80.5;
+        this.canvas = canvas;
+        this.x = x;
+        this.y = y;
         dx = 0;
         dy = 0;
         acceleration = 30;
@@ -40,8 +43,10 @@ public class Player implements GameObject, Entity {
         CollisionBox collBox = new CollisionBox(x, y, width-8, height-6);
         collBoxes.add(collBox);
         weapons = new ArrayList<Weapon>();
-        weapons.add(new RangedWeap("badPistol", this, ally));
+        weapons.add(new RangedWeap("badPistol", this, ally, canvas, frame));
         curWeapon_i = 0;
+        canvas.addGameObject(this);
+        this.frame = frame;
     }
 
     public double getX() {return x;}

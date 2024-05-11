@@ -9,13 +9,13 @@ public class Sprite {
     private ArrayList<BufferedImage> frames;
     private BufferedImage cur_sprite;
     private int sprite_i;
-    private int width, height, scaleY, scaleX;
+    private int width, height, scaleY;
     private int faceDir = 1;
     private boolean isWalking;
     private double maxJumpHeight, jheight;
     private double angle;
 
-    public Sprite(ArrayList<File> frames, double maxJumpHeight) {
+    public Sprite(ArrayList<File> frames) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
         for (File file : frames) {
             try {
@@ -29,7 +29,7 @@ public class Sprite {
         cur_sprite = this.frames.get(sprite_i);
         width = cur_sprite.getWidth();
         height = cur_sprite.getHeight();
-        this.maxJumpHeight = maxJumpHeight;
+        maxJumpHeight = 2;
         angle = 0;
         scaleY = 1;
     }

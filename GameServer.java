@@ -62,20 +62,14 @@ public class GameServer {
         gateThread.start();
     }
 
-    public class emitArg {
-        private String type;
-        private Object value;
-        public emitArg(String type, Object value) {this.type = type; this.value = value;}
-        public String getType() {return type;}
-        public Object getValue() {return value;}
-    }
-
-    public synchronized void emitAll(String command, ArrayList<emitArg> args) {
+    public synchronized void emitAll(String command, ArrayList<emitArg> args, int playerID) {
         synchronized (clients) {
             if (emitAllReady) {
                 emitAllReady = false;
                 for (Client c : clients) {
-                    c.emit(command, args);
+                    if (c.getID()!=playerID) {
+                        c.emit(command, args);
+                    }
                 }
                 emitAllReady = true;
             }
@@ -201,17 +195,29 @@ public class GameServer {
             while (!stopped) {
                 try {
                     String command = dataIn.readUTF();
-                    // System.out.println("received command " + command);
-                    switch (command) {
-                        case "setPos":
-                            c.getPlayer().setX(dataIn.readDouble());
-                            c.getPlayer().setY(dataIn.readDouble());
-                            c.getPlayer().setDx(dataIn.readDouble());
-                            c.getPlayer().setDy(dataIn.readDouble());
-                            c.getPlayer().setFaceDir(dataIn.readInt());
-                            c.getPlayer().setWalking(dataIn.readBoolean());
-                            c.getPlayer().setAngle(dataIn.readDouble());
-                            break;
+                    if (command.startsWith("com_")) {
+                        switch (command) {
+                            case "com_setPos":
+                                c.getPlayer().setX(dataIn.readDouble());
+                                c.getPlayer().setY(dataIn.readDouble());
+                                c.getPlayer().setDx(dataIn.readDouble());
+                                c.getPlayer().setDy(dataIn.readDouble());
+                                c.getPlayer().setFaceDir(dataIn.readInt());
+                                c.getPlayer().setWalking(dataIn.readBoolean());
+                                c.getPlayer().setAngle(dataIn.readDouble());
+                                break;
+                            case "com_newBullet":
+                                ArrayList<emitArg> args = new ArrayList<emitArg>();
+                                args.add(new emitArg("utf", dataIn.readUTF()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
+                                emitAll("newBullet", args, playerID);
+                                System.out.println("sent new bullet");
+                                break;
+                        }
                     }
                 } catch (IOException ex) {
                     System.out.println("IOException from ReadFromServer Thread");
@@ -293,6 +299,7 @@ public class GameServer {
                     int pFaceDir = c.getPlayer().getFaceDir();
                     boolean isWalking = c.getPlayer().getWalking();
                     double angle = c.getPlayer().getAngle();
+
                     ArrayList<emitArg> args = new ArrayList<emitArg>();
                     args.add(new emitArg("int", c.getID()));
                     args.add(new emitArg("double", pX));
@@ -302,7 +309,7 @@ public class GameServer {
                     args.add(new emitArg("int", pFaceDir));
                     args.add(new emitArg("boolean", isWalking));
                     args.add(new emitArg("double", angle));
-                    emitAll("setAllyPos", args);
+                    emitAll("setAllyPos", args, c.getID());
                 }
                 try {
                     Thread.sleep(100); // some delay for writing data

@@ -1,4 +1,3 @@
-import java.awt.PointerInfo;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -54,14 +53,15 @@ public class GameFrame implements KeyListener {
     public void newClient(int id, double x, double y) {
         int newClientId = id;
         if (newClientId != clientID) {
-            Player ally = new Player(26, true);
-            ally.setX(x);
-            ally.setY(y);
-            canvas.addGameObject(ally);
+            Player ally = new Player(26, (int)x, (int)y, true, canvas, null);
             AnimationThread.addSprite(ally.getSprite());
             clients.put(newClientId, ally);
             allies.add(ally);
         }
+    }
+
+    public void sendCommand(String command, ArrayList<emitArg> args) {
+        wtsRunnable.sendCommand(command, args);
     }
 
     private class ReadFromServer implements Runnable {
@@ -111,6 +111,16 @@ public class GameFrame implements KeyListener {
                                         }
                                     }
                                     break;
+                                case "com_newBullet":
+                                    String type = dataIn.readUTF();
+                                    double x = dataIn.readDouble();
+                                    double y = dataIn.readDouble();
+                                    double dx = dataIn.readDouble();
+                                    double dy = dataIn.readDouble();
+                                    double angle = dataIn.readDouble();
+                                    
+                                    new Bullet(type, x, y, dx, dy, angle, canvas);
+                                    break;
                             }
                         } else {
                             try {
@@ -132,21 +142,42 @@ public class GameFrame implements KeyListener {
         public WriteToServer(DataOutputStream out) {
             dataOut = out;
         }
-
-        public void setPos() {
+        
+        public void sendCommand(String command, ArrayList<emitArg> args) {
             try {
-                dataOut.writeUTF("setPos");
-                dataOut.writeDouble(player.getX());
-                dataOut.writeDouble(player.getY());
-                dataOut.writeDouble(player.getDx());
-                dataOut.writeDouble(player.getDy());
-                dataOut.writeInt(player.getSprite().getFaceDir());
-                dataOut.writeBoolean(player.getSprite().isWalkingBool());
-                dataOut.writeDouble(player.getWeapon().getAngle());
+                dataOut.writeUTF("com_"+command);
+                for (emitArg arg : args) {
+                    switch (arg.getType()) {
+                        case "utf":
+                            dataOut.writeUTF((String)arg.getValue());
+                            break;
+                        case "double":
+                            dataOut.writeDouble((double)arg.getValue());
+                            break;
+                        case "int":
+                            dataOut.writeInt((int)arg.getValue());
+                            break;
+                        case "boolean":
+                            dataOut.writeBoolean((boolean)arg.getValue());
+                            break;
+                    }
+                }
                 dataOut.flush();
             } catch (IOException ex) {
-                System.out.println("IOException at setPos");
+                System.out.println("IOException at sendCommand");
             } 
+        }
+
+        public void setPos() {
+            ArrayList<emitArg> args = new ArrayList<emitArg>();
+            args.add(new emitArg("double", player.getX()));
+            args.add(new emitArg("double", player.getY()));
+            args.add(new emitArg("double", player.getDx()));
+            args.add(new emitArg("double", player.getDy()));
+            args.add(new emitArg("int", player.getSprite().getFaceDir()));
+            args.add(new emitArg("boolean", player.getSprite().isWalkingBool()));
+            args.add(new emitArg("double", player.getWeapon().getAngle()));
+            sendCommand("setPos", args);
         }
 
         public void run() {
@@ -199,8 +230,7 @@ public class GameFrame implements KeyListener {
     }
 
     public void initPlayer() {
-        player = new Player(26, false);
-        canvas.addGameObject(player);
+        player = new Player(26, 0,0,false, canvas, this);
         AnimationThread.addSprite(player.getSprite());
         canvas.focus(player);
         connectToServer();
@@ -221,6 +251,7 @@ public class GameFrame implements KeyListener {
                 ally.update(deltaTime, curMap);
             }
         }
+        canvas.tickObjects(deltaTime);
 
         lastFrameTime = currentTime;
     }
