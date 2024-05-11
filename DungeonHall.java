@@ -39,6 +39,8 @@ public class DungeonHall extends DungeonPiece implements GameObject  {
         return res;
     } 
 
+    public void update(long dt) {};
+
     public int getWidth() {return width;}
     public int getHeight() {return height;}
     public boolean isColliding(CollisionBox other) {return false;}

@@ -34,6 +34,7 @@ public class DungeonRoom extends DungeonPiece implements GameObject {
             }
         }
     }
+    public void update(long dt) {};
 
     public int[] getRoomCenter() {
         int[] res = {x+(width/2), y+(height/2)};

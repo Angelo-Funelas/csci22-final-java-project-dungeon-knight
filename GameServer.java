@@ -95,7 +95,7 @@ public class GameServer {
         private ArrayList<Client> clients;
 
         private class Player {
-            private double x, y, dx, dy;
+            private double x, y, dx, dy, angle;
             private int faceDir;
             private boolean isWalking;
             public Player() {
@@ -116,6 +116,8 @@ public class GameServer {
             public int getFaceDir() {return faceDir;}
             public void setWalking(boolean isWalking) {this.isWalking = isWalking;}
             public boolean getWalking() {return isWalking;}
+            public void setAngle(double angle) {this.angle=angle;}
+            public double getAngle() {return angle;}
         }
 
         public int getID() {return clientID;}
@@ -208,6 +210,7 @@ public class GameServer {
                             c.getPlayer().setDy(dataIn.readDouble());
                             c.getPlayer().setFaceDir(dataIn.readInt());
                             c.getPlayer().setWalking(dataIn.readBoolean());
+                            c.getPlayer().setAngle(dataIn.readDouble());
                             break;
                     }
                 } catch (IOException ex) {
@@ -289,6 +292,7 @@ public class GameServer {
                     double pDy = c.getPlayer().getDy();
                     int pFaceDir = c.getPlayer().getFaceDir();
                     boolean isWalking = c.getPlayer().getWalking();
+                    double angle = c.getPlayer().getAngle();
                     ArrayList<emitArg> args = new ArrayList<emitArg>();
                     args.add(new emitArg("int", c.getID()));
                     args.add(new emitArg("double", pX));
@@ -297,6 +301,7 @@ public class GameServer {
                     args.add(new emitArg("double", pDy));
                     args.add(new emitArg("int", pFaceDir));
                     args.add(new emitArg("boolean", isWalking));
+                    args.add(new emitArg("double", angle));
                     emitAll("setAllyPos", args);
                 }
                 try {

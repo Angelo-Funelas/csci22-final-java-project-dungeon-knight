@@ -1,3 +1,4 @@
+import java.awt.PointerInfo;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -92,6 +93,7 @@ public class GameFrame implements KeyListener {
                                     double data_dy = dataIn.readDouble();
                                     int data_faceDir = dataIn.readInt();
                                     boolean data_isWalking = dataIn.readBoolean();
+                                    double data_angle = dataIn.readDouble();
                                     // System.out.println(data_x + " " + data_y);
                                     // System.out.println(data_dx + " " + data_dy);
                                     if (targetID!=clientID) {
@@ -103,6 +105,7 @@ public class GameFrame implements KeyListener {
                                             targetAlly.setDy(data_dy);
                                             if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
                                             targetAlly.getSprite().setWalking(data_isWalking);;
+                                            targetAlly.getWeapon().setAngle(data_angle);
                                         } else {
                                             newClient(targetID, data_x, data_y);
                                         }
@@ -139,6 +142,7 @@ public class GameFrame implements KeyListener {
                 dataOut.writeDouble(player.getDy());
                 dataOut.writeInt(player.getSprite().getFaceDir());
                 dataOut.writeBoolean(player.getSprite().isWalkingBool());
+                dataOut.writeDouble(player.getWeapon().getAngle());
                 dataOut.flush();
             } catch (IOException ex) {
                 System.out.println("IOException at setPos");

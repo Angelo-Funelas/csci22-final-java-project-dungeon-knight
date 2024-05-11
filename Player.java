@@ -5,13 +5,13 @@ import java.awt.*;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
-    private int scale, width, height, zIndex;
+    private int scale, width, height, zIndex,curWeapon_i;
     private double x,y,dx,dy;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
     private Color debugColor = new Color(255, 0, 0, 255);
-    private ArrayList<GameObject> weapons;
+    private ArrayList<Weapon> weapons;
 
     public Player(int scale, boolean ally) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -39,8 +39,9 @@ public class Player implements GameObject, Entity {
         collBoxes = new ArrayList<CollisionBox>();
         CollisionBox collBox = new CollisionBox(x, y, width-8, height-6);
         collBoxes.add(collBox);
-        weapons = new ArrayList<GameObject>();
-        weapons.add(new RangedWeap("badPistol", this));
+        weapons = new ArrayList<Weapon>();
+        weapons.add(new RangedWeap("badPistol", this, ally));
+        curWeapon_i = 0;
     }
 
     public double getX() {return x;}
@@ -51,10 +52,11 @@ public class Player implements GameObject, Entity {
     public void setY(double y) {this.y = y;}
     public void setDx(double dx) {this.dx = dx;}
     public void setDy(double dy) {this.dy = dy;}
+    public Weapon getWeapon() {return weapons.get(curWeapon_i);}
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
-        for (GameObject weapon : weapons) {
+        for (Weapon weapon : weapons) {
             weapon.draw(g2d);
         }
         if (GameStarter.debugMode) {
@@ -71,12 +73,13 @@ public class Player implements GameObject, Entity {
         return sprite;
     }
     // sqrt((speed*speed)/2) = a
+    public void update(long dt) {}
     public void update(long dt, Map curMap) {
         if (!ally) {
             if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
             if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
-            if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0; sprite.faceLeft();}
-            if (moveRight) {dx += (double) (acceleration) * dt / 1000.0; sprite.faceRight();}
+            if (moveLeft) {dx += (double) (-acceleration) * dt / 1000.0;}
+            if (moveRight) {dx += (double) (acceleration) * dt / 1000.0;}
     
             double cur_maxSpeed = maxSpeed;
             if ((moveUp || moveDown) && (moveLeft || moveRight) && !(moveUp && moveDown) && !(moveLeft && moveRight)) {
@@ -113,6 +116,9 @@ public class Player implements GameObject, Entity {
             dy *= friction;
             x += dx;
             y += dy;
+        }
+        for (Weapon weapon : weapons) {
+            weapon.update(dt);
         }
 
     }

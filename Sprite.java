@@ -9,10 +9,11 @@ public class Sprite {
     private ArrayList<BufferedImage> frames;
     private BufferedImage cur_sprite;
     private int sprite_i;
-    private int width, height;
+    private int width, height, scaleY, scaleX;
     private int faceDir = 1;
     private boolean isWalking;
     private double maxJumpHeight, jheight;
+    private double angle;
 
     public Sprite(ArrayList<File> frames, double maxJumpHeight) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
@@ -29,6 +30,8 @@ public class Sprite {
         width = cur_sprite.getWidth();
         height = cur_sprite.getHeight();
         this.maxJumpHeight = maxJumpHeight;
+        angle = 0;
+        scaleY = 1;
     }
     public double getJheight() {
         return jheight;
@@ -42,14 +45,31 @@ public class Sprite {
             jheight = 0;
         }
     }
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+
     public void setWalking(boolean b) {isWalking = b;}
+    public void flipVertical(int scaleY) {
+        this.scaleY = scaleY;
+    }
+
     public void draw(Graphics2D g2d, int scale, double x, double y) {
         AffineTransform reset = g2d.getTransform();
         if (faceDir == -1) {
             x += width;
         }
         g2d.translate(x, y-jheight);
-        g2d.drawImage(cur_sprite, 0, 0, scale*faceDir, scale, null);
+        if (angle!=0) {
+            if (scaleY == -1) {
+                g2d.translate(0, height);
+                g2d.rotate(angle, width/2, -height/2);
+            } else {
+                g2d.rotate(angle, width/2, height/2);
+            }
+        }
+        g2d.drawImage(cur_sprite, 0, 0, scale*faceDir, scale*scaleY, null);
         g2d.setTransform(reset);
     }
     public void faceLeft() {faceDir = -1;}
