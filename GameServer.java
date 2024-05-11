@@ -311,8 +311,7 @@ public class GameServer {
 
         public void run() {
             while (!stopped) {
-                ArrayList<Client> curClients = new ArrayList<Client>(clients);
-                for (Client c : curClients) {
+                for (Client c : clients) {
                     double pX = c.getPlayer().getX();
                     double pY = c.getPlayer().getY();
                     double pDx = c.getPlayer().getDx();

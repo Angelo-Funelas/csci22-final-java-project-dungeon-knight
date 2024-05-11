@@ -128,6 +128,7 @@ public class GameFrame implements KeyListener {
                                 case "com_setID":
                                     clientID = dataIn.readInt();
                                     System.out.println("Connected to server as Client #" + clientID);
+                                    frame.setTitle(String.format("Final Project - Dungeon Knight (Client #%d)", clientID));
                                     break;
                                 case "com_setAllyPos":
                                     int targetID = dataIn.readInt();
