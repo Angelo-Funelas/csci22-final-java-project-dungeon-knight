@@ -237,6 +237,7 @@ public class GameServer {
                         } 
                     }
                 } catch (UTFDataFormatException ex) {
+                    System.out.println("IOException from ReadFromServer Thread: " + ex);
                     System.out.println("Client #"+c.getID()+" desynced streams, attempting reconnection... disconnecting");
                     c.disconnectClient();
                 } catch (IOException ex) {
