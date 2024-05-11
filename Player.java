@@ -6,7 +6,7 @@ import java.awt.*;
 public class Player implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex,curWeapon_i;
-    private double x,y,dx,dy;
+    private double x,y,dx,dy, lastx, lasty;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private double acceleration, friction, maxSpeed;
     private ArrayList<CollisionBox> collBoxes;
@@ -38,6 +38,7 @@ public class Player implements GameObject, Entity {
         maxSpeed = 200;
         friction = 0.8;
         zIndex = 1000000;
+        if (!ally) {zIndex+=10;}
         width = sprite.getWidth();
         height = sprite.getHeight();
         collBoxes = new ArrayList<CollisionBox>();
@@ -53,10 +54,14 @@ public class Player implements GameObject, Entity {
 
     public double getX() {return x;}
     public double getY() {return y;}
+    public double getlX() {return lastx;}
+    public double getlY() {return lasty;}
     public double getDx() {return dx;}
     public double getDy() {return dy;}
     public void setX(double x) {this.x = x;}
     public void setY(double y) {this.y = y;}
+    public void setlX(double lastx) {this.lastx = lastx;}
+    public void setlY(double lasty) {this.lasty = lasty;}
     public void setDx(double dx) {this.dx = dx;}
     public void setDy(double dy) {this.dy = dy;}
     public Weapon getWeapon() {return weapons.get(curWeapon_i);}

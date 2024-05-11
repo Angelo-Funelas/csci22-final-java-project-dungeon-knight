@@ -26,6 +26,9 @@ public class GameFrame implements KeyListener {
     private WriteToServer wtsRunnable;
     private Thread readThread, writeThread;
     private GameFrame thisframe;
+    DataInputStream dataInpStream;
+    DataOutputStream dataOutStream;
+
 
     public GameFrame() {
         frame = new JFrame();
@@ -40,11 +43,11 @@ public class GameFrame implements KeyListener {
     private void connectToServer() {
         try {
             socket = new Socket("localhost", 55555);
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dataInpStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream dataOutStream = new DataOutputStream(socket.getOutputStream());
 
-            rfsRunnable = new ReadFromServer(in);
-            wtsRunnable = new WriteToServer(out);
+            rfsRunnable = new ReadFromServer(dataInpStream);
+            wtsRunnable = new WriteToServer(dataOutStream);
 
             readThread = new Thread(rfsRunnable);
             writeThread = new Thread(wtsRunnable);
@@ -55,6 +58,11 @@ public class GameFrame implements KeyListener {
             connectedToServer = true;
         } catch (IOException ex) {
             System.out.println("IOException from connectToServer()");
+            try {
+                Thread.sleep(1000); // some delay for writing data
+            }
+            catch (InterruptedException exc) {}
+            connectToServer();
         }
     }
 
@@ -71,17 +79,42 @@ public class GameFrame implements KeyListener {
         wtsRunnable.sendCommand(command, args);
     }
 
+    
+    public void disconnect() {
+        try {
+            if (dataInpStream != null) dataInpStream.close();
+            if (dataOutStream != null) dataOutStream.close();
+            
+            // Interrupt read and write threads
+            rfsRunnable.stopThread();
+            wtsRunnable.stopThread();
+            
+            // Close the socket
+            if (socket != null) socket.close();
+
+        } catch (IOException ex) {
+            System.out.println("IOException at disconnect()");
+        }
+    }
+
     private class ReadFromServer implements Runnable {
         private DataInputStream dataIn;
-        private boolean readReady;
+        private boolean readReady, running;
+        private int consequentExceptions, maxExceptions;
 
         public ReadFromServer(DataInputStream in) {
             dataIn = in;
             readReady = true;
+            running = true;
+            maxExceptions = 3;
+        }
+
+        public void stopThread() {
+            running = false;
         }
 
         public void run() {
-            while (true) {
+            while (running) {
                 if (readReady) {
                     try {
                         readReady = false;
@@ -106,13 +139,17 @@ public class GameFrame implements KeyListener {
                                     if (targetID!=clientID) {
                                         Player targetAlly = clients.get(targetID);
                                         if (targetAlly != null) {
-                                            targetAlly.setX(data_x);
-                                            targetAlly.setY(data_y);
-                                            targetAlly.setDx(data_dx);
-                                            targetAlly.setDy(data_dy);
-                                            if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
-                                            targetAlly.getSprite().setWalking(data_isWalking);;
-                                            targetAlly.getWeapon().setAngle(data_angle);
+                                            if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y) {
+                                                targetAlly.setX(data_x);
+                                                targetAlly.setY(data_y);
+                                                targetAlly.setDx(data_dx);
+                                                targetAlly.setDy(data_dy);
+                                                if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
+                                                targetAlly.getSprite().setWalking(data_isWalking);;
+                                                targetAlly.getWeapon().setAngle(data_angle);
+                                                targetAlly.setlX(data_x);
+                                                targetAlly.setlX(data_y);
+                                            }
                                         } else {
                                             newClient(targetID, data_x, data_y);
                                         }
@@ -136,6 +173,15 @@ public class GameFrame implements KeyListener {
                         }
                     } catch (IOException ex) {
                         System.out.println("IOException from ReadFromServer Thread " + ex);
+                        consequentExceptions++;
+                        try {
+                            Thread.sleep(1000); // some delay for writing data
+                        }
+                        catch (InterruptedException exc) {}
+                        if (consequentExceptions>maxExceptions) {
+                            disconnect();
+                            connectToServer();
+                        }
                     }
                     readReady = true;
                 }
@@ -145,9 +191,15 @@ public class GameFrame implements KeyListener {
 
     private class WriteToServer implements Runnable {
         private DataOutputStream dataOut;
+        private boolean running;
 
         public WriteToServer(DataOutputStream out) {
             dataOut = out;
+            running = true;
+        }
+
+        public void stopThread() {
+            running = false;
         }
         
         public void sendCommand(String command, ArrayList<emitArg> args) {
@@ -188,7 +240,7 @@ public class GameFrame implements KeyListener {
         }
 
         public void run() {
-            while (true) {
+            while (running) {
                 setPos();
                 try {
                     Thread.sleep(25); // some delay for writing data
