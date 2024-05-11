@@ -1,6 +1,6 @@
 import java.awt.Graphics2D;
 
-public class Weapon {
+public abstract class Weapon {
     double angle;
     long lastAttackTime;
 

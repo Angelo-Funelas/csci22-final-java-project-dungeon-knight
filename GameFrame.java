@@ -38,17 +38,20 @@ public class GameFrame implements KeyListener {
         thisframe = this;
         addEntitySafe = true;
         connectedToServer = false;
+        clientID = -1;
     }
 
     private void connectToServer() {
         try {
-            socket = new Socket("localhost", 55555);
+            socket = new Socket(GameStarter.host, 55555);
             DataInputStream dataInpStream = new DataInputStream(socket.getInputStream());
             DataOutputStream dataOutStream = new DataOutputStream(socket.getOutputStream());
 
             rfsRunnable = new ReadFromServer(dataInpStream);
             wtsRunnable = new WriteToServer(dataOutStream);
 
+            dataOutStream.writeInt(clientID);
+            
             readThread = new Thread(rfsRunnable);
             writeThread = new Thread(wtsRunnable);
             readThread.start();
@@ -67,6 +70,7 @@ public class GameFrame implements KeyListener {
     }
 
     public void newClient(int id, double x, double y) {
+        System.out.println("Client #" + id + " joined!");
         int newClientId = id;
         if (newClientId != clientID) {
             Player ally = new Player(26, (int)x, (int)y, true, canvas, this, entities);
@@ -139,7 +143,7 @@ public class GameFrame implements KeyListener {
                                     if (targetID!=clientID) {
                                         Player targetAlly = clients.get(targetID);
                                         if (targetAlly != null) {
-                                            targetAlly.ping();;
+                                            targetAlly.ping();
                                             if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y) {
                                                 targetAlly.setX(data_x);
                                                 targetAlly.setY(data_y);
@@ -149,7 +153,7 @@ public class GameFrame implements KeyListener {
                                                 targetAlly.getSprite().setWalking(data_isWalking);;
                                                 targetAlly.getWeapon().setAngle(data_angle);
                                                 targetAlly.setlX(data_x);
-                                                targetAlly.setlX(data_y);
+                                                targetAlly.setlY(data_y);
                                             }
                                         } else {
                                             newClient(targetID, data_x, data_y);

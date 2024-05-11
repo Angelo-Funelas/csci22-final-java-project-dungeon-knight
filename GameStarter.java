@@ -2,6 +2,7 @@ public class GameStarter {
     public static boolean debugMode;
     public static double zoom;
     public static int framerate = 75;
+    public static String host;
     public static void main(String args[]) {
         try {
             debugMode = (args[0].equals("true"));
@@ -13,6 +14,12 @@ public class GameStarter {
             System.out.println("Set custom zoom to " + zoom);
         } catch (Exception e) {
             zoom = 3;
+        }
+        try {
+            host = args[2];
+            System.out.println("Set custom host to " + host);
+        } catch (Exception e) {
+            host = "gemplo.com";
         }
         GameFrame game = new GameFrame();
         game.setUpGUI();

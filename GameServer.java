@@ -63,10 +63,11 @@ public class GameServer {
     }
 
     public synchronized void emitAll(String command, ArrayList<emitArg> args, int playerID) {
+        ArrayList<Client> emitClients = new ArrayList<Client>(clients);
         synchronized (clients) {
             if (emitAllReady) {
                 emitAllReady = false;
-                for (Client c : clients) {
+                for (Client c : emitClients) {
                     if (c.getID()!=playerID) {
                         c.emit(command, args);
                     }
@@ -131,6 +132,7 @@ public class GameServer {
                 
                 // Remove this client from the list of clients
                 if (clients != null) clients.remove(this);
+                socket.close();
 
             } catch (IOException ex) {
 
@@ -139,12 +141,20 @@ public class GameServer {
 
         public Client(Socket s, ArrayList<Client> clients) {
             socket = s;
-            clientID = totalClientCount;
-            totalClientCount++;
             this.clients = clients;
             try {
                 inputStream = new DataInputStream(s.getInputStream());
                 outputStream = new DataOutputStream(s.getOutputStream());
+
+                int receivedID = inputStream.readInt();
+                
+                if (receivedID == -1) {
+                    clientID = totalClientCount;
+                    totalClientCount++;
+                } else {
+                    clientID = receivedID;
+                    totalClientCount = Math.max(receivedID+1,totalClientCount);
+                }
 
                 rfc = new ReadFromClient(this, inputStream);
                 wtc = new WriteToClient(this, outputStream);
@@ -176,15 +186,17 @@ public class GameServer {
         Client c;
         private int consequentExceptions, maxExceptions;
         private boolean stopped;
+        private String lastValidCom;
 
         public ReadFromClient(Client c, DataInputStream in) {
             this.c = c;
             playerID = c.getID();
             dataIn = in;
             consequentExceptions = 0;
-            maxExceptions = 8;
+            maxExceptions = 5;
             System.out.println("RFC" + playerID + " Runnable created!");
             stopped = false;
+            lastValidCom = null;
         }
         
         public void stopThread() {
@@ -194,7 +206,13 @@ public class GameServer {
         public void run() {
             while (!stopped) {
                 try {
-                    String command = dataIn.readUTF();
+                    String command;
+                    if (lastValidCom==null) {
+                        command = dataIn.readUTF();
+                    } else {
+                        command = lastValidCom;
+                        System.out.println("Resynced stream");
+                    }
                     if (command.startsWith("com_")) {
                         switch (command) {
                             case "com_setPos":
@@ -217,15 +235,17 @@ public class GameServer {
                                 emitAll("newBullet", args, playerID);
                                 System.out.println("sent new bullet");
                                 break;
-                        }
+                        } 
                     }
+                } catch (UTFDataFormatException ex) {
+                    System.out.println("Client #"+c.getID()+" desynced streams, attempting reconnection... disconnecting");
+                    c.disconnectClient();
                 } catch (IOException ex) {
                     System.out.println("IOException from ReadFromServer Thread: " + ex);
                     consequentExceptions++;
                     if (consequentExceptions>maxExceptions) {
-                        System.out.println("Exceeded maxexceptions, disconnecting client");
+                        System.out.println("Exceeded maxexceptions, disconnecting Client #"+c.getID());
                         c.disconnectClient();
-
                     }
                     try {
                         Thread.sleep(25); // some delay for writing data
@@ -291,7 +311,8 @@ public class GameServer {
 
         public void run() {
             while (!stopped) {
-                for (Client c : clients) {
+                ArrayList<Client> curClients = new ArrayList<Client>(clients);
+                for (Client c : curClients) {
                     double pX = c.getPlayer().getX();
                     double pY = c.getPlayer().getY();
                     double pDx = c.getPlayer().getDx();
