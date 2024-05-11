@@ -140,7 +140,7 @@ public class DungeonGenerator {
         return dungeon1Obj;
     }
 
-    public static DungeonHallway GenerateHallway(int gridX, int gridY, int tileWidth, int tileHeight, Random random, boolean vertical) {
+    public static DungeonHall GenerateHallway(int gridX, int gridY, int tileWidth, int tileHeight, Random random, boolean vertical) {
         int areaWidth = tileWidth*16;
         int areaHeight = (tileHeight*16)+16;
         BufferedImage combinedImage;
@@ -188,6 +188,6 @@ public class DungeonGenerator {
 
 
         g2d.dispose();
-        return new DungeonHallway(combinedImage, gridY, areaWidth, areaHeight, gridX, gridY, collBoxes);
+        return new DungeonHall(combinedImage, gridY, areaWidth, areaHeight, gridX, gridY, collBoxes);
     }
 }

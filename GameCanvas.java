@@ -10,7 +10,7 @@ public class GameCanvas extends JComponent {
     private ArrayList<GameObject> GameObjects;
     private Color backgroundColor;
     private GameObject target;
-    private double zoom = 3;
+    private double zoom = 0.2;
     
     public GameCanvas(int w, int h) {
         width = w;

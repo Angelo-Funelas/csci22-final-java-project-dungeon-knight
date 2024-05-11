@@ -2,16 +2,15 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class DungeonHallway implements GameObject, DungeonPiece {
+public class DungeonHall extends DungeonPiece implements GameObject  {
     BufferedImage image;
     int scaleX, scaleY, width, height;
     int x,y,zIndex;
-    ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
 
     public double getX() {return x;}
     public double getY() {return y;}
 
-    public DungeonHallway(BufferedImage img, int zIndex, int scaleX, int scaleY, int x, int y, ArrayList<CollisionBox> collBoxes) {
+    public DungeonHall(BufferedImage img, int zIndex, int scaleX, int scaleY, int x, int y, ArrayList<CollisionBox> collBoxes) {
         image = img;
         this.zIndex = zIndex;
         this.scaleX = scaleX;
@@ -39,10 +38,6 @@ public class DungeonHallway implements GameObject, DungeonPiece {
         int[] res = {x+(scaleX/2), y+(scaleY/2)};
         return res;
     } 
-
-    public ArrayList<CollisionBox> getCollisionBoxes() {
-        return collBoxes;
-    }
 
     public int getWidth() {return width;}
     public int getHeight() {return height;}

@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
-public interface DungeonPiece {
-    public ArrayList<CollisionBox> getCollisionBoxes();
+public abstract class DungeonPiece {
+    ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
+ 
+    public ArrayList<CollisionBox> getCollisionBoxes() {
+        return collBoxes;
+    }
 }

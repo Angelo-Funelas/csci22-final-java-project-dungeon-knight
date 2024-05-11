@@ -3,11 +3,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class DungeonRoom implements GameObject, DungeonPiece {
+public class DungeonRoom extends DungeonPiece implements GameObject {
     BufferedImage image;
     int tileWidth, tileHeight, width, height;
     int x,y,zIndex;
-    ArrayList<CollisionBox> collBoxes = new ArrayList<CollisionBox>();
 
     public double getX() {return x;}
     public double getY() {return y;}
@@ -41,10 +40,6 @@ public class DungeonRoom implements GameObject, DungeonPiece {
         return res;
     } 
 
-    public ArrayList<CollisionBox> getCollisionBoxes() {
-        return collBoxes;
-    }
-
     public int getWidth() {return width;}
     public int getHeight() {return height;}
 
@@ -63,8 +58,8 @@ public class DungeonRoom implements GameObject, DungeonPiece {
     public int compareTo(GameObject other) {
         return Integer.compare(this.getZIndex(), other.getZIndex());
     }
-    public void attach(String direction, int tileWidth, int tileHeight, Random random, GameCanvas canvas, Map map) {
-        DungeonHallway hallway;
+    public DungeonRoom attach(String direction, int tileWidth, int tileHeight, boolean[] doors, Random random, GameCanvas canvas, Map map) {
+        DungeonHall hallway;
         DungeonRoom room;
         int newHallLength = (27-tileHeight)/2;
         int hallLength = 16+this.getHallLength()+newHallLength;
@@ -78,7 +73,7 @@ public class DungeonRoom implements GameObject, DungeonPiece {
                 roomY = hallwayY - ((tileHeight-7)*16/2);
 
                 hallway = DungeonGenerator.GenerateHallway(hallwayX, hallwayY, hallLength, 7, random, false);
-                room = DungeonGenerator.GenerateBattleRoom(roomX, roomY, tileWidth, tileHeight, false,false,false,true, random); 
+                doors[3] = true;
                 break;
             case "right":
                 hallwayX = x + width;
@@ -88,7 +83,7 @@ public class DungeonRoom implements GameObject, DungeonPiece {
                 roomY = hallwayY - ((tileHeight-7)*16/2);
 
                 hallway = DungeonGenerator.GenerateHallway(hallwayX, hallwayY, hallLength, 7, random, false);
-                room = DungeonGenerator.GenerateBattleRoom(roomX, roomY, tileWidth, tileHeight, false,false,true,false, random); 
+                doors[2] = true; 
                 break;
             case "up":
                 hallwayX = x + width/2 - 4*16 + 8;
@@ -98,7 +93,7 @@ public class DungeonRoom implements GameObject, DungeonPiece {
                 roomY = (y+8) - 16*(hallLength+tileHeight);
 
                 hallway = DungeonGenerator.GenerateHallway(hallwayX, hallwayY, 7, hallLength, random, true);
-                room = DungeonGenerator.GenerateBattleRoom(roomX, roomY, tileWidth, tileHeight, false,true,false,false, random); 
+                doors[1] = true; 
                 break;
             case "down":
                 hallwayX = x + width/2 - 4*16 + 8;
@@ -108,15 +103,19 @@ public class DungeonRoom implements GameObject, DungeonPiece {
                 roomY = (y+8) + 16*(this.tileHeight+hallLength);
 
                 hallway = DungeonGenerator.GenerateHallway(hallwayX, hallwayY, 7, hallLength, random, true);
-                room = DungeonGenerator.GenerateBattleRoom(roomX, roomY, tileWidth, tileHeight, true,false,false,false, random); 
+                doors[0] = true; 
                 break;
             default:
                 hallway = DungeonGenerator.GenerateHallway(0, 0, 0, 0, random, false);
                 room = DungeonGenerator.GenerateBattleRoom(0, 0, 0, 0, false,false,false,false, random); 
+                roomX = 0;
+                roomY = 0;
             }
+        room = DungeonGenerator.GenerateBattleRoom(roomX, roomY, tileWidth, tileHeight, doors[0],doors[1],doors[2],doors[3], random); 
         map.addPiece(hallway);
         canvas.addGameObject(hallway);
         map.addPiece(room);
         canvas.addGameObject(room);
+        return room;
     }
 }

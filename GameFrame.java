@@ -202,7 +202,7 @@ public class GameFrame implements KeyListener {
         connectToServer();
     }
     public void prepareLevel() {
-        curMap = new Map(3, 3, canvas, 0);
+        curMap = new Map(3, 3, canvas, 15);
         player.setX(0);
         player.setY(0);
     }
