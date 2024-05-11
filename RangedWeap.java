@@ -87,17 +87,18 @@ public class RangedWeap extends Weapon implements GameObject {
     public void attack() {
         double dx = Math.cos(angle)*bulletSpeed;
         double dy = Math.sin(angle)*bulletSpeed;
+        if (GameFrame.connectedToServer) {
+            ArrayList<emitArg> args = new ArrayList<emitArg>();
+            args.add(new emitArg("utf", "player"));
+            args.add(new emitArg("double", x+xOffset));
+            args.add(new emitArg("double", y));
+            args.add(new emitArg("double", dx));
+            args.add(new emitArg("double", dy));
+            args.add(new emitArg("double", angle));
+            frame.sendCommand("newBullet", args);
+        }
 
-        ArrayList<emitArg> args = new ArrayList<emitArg>();
-        args.add(new emitArg("utf", "player"));
-        args.add(new emitArg("double", x+xOffset));
-        args.add(new emitArg("double", y));
-        args.add(new emitArg("double", dx));
-        args.add(new emitArg("double", dy));
-        args.add(new emitArg("double", angle));
-        frame.sendCommand("newBullet", args);
-
-        new Bullet("player", x+xOffset, y, dx, dy, angle, canvas);
+        new Bullet("player", x+xOffset, y, dx, dy, angle, canvas, frame);
     }
 
     public void draw(Graphics2D g2d) {

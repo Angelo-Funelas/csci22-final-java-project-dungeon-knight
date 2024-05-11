@@ -16,7 +16,8 @@ public class GameFrame implements KeyListener {
     private long lastFrameTime;
     private Map curMap;
     private Player player;
-    private ArrayList<Player> allies;
+    private ArrayList<Entity> entities, entityQueue, entityRemoveQueue;
+    public static boolean addEntitySafe, connectedToServer;
     private HashMap<Integer, Player> clients;
 
     private Socket socket;
@@ -24,9 +25,16 @@ public class GameFrame implements KeyListener {
     private ReadFromServer rfsRunnable;
     private WriteToServer wtsRunnable;
     private Thread readThread, writeThread;
+    private GameFrame thisframe;
 
     public GameFrame() {
         frame = new JFrame();
+        entities = new ArrayList<Entity>();
+        entityQueue = new ArrayList<Entity>();
+        entityRemoveQueue = new ArrayList<Entity>();
+        thisframe = this;
+        addEntitySafe = true;
+        connectedToServer = false;
     }
 
     private void connectToServer() {
@@ -43,8 +51,8 @@ public class GameFrame implements KeyListener {
             readThread.start();
             writeThread.start();
 
-            allies = new ArrayList<Player>();
             clients = new HashMap<Integer, Player>();
+            connectedToServer = true;
         } catch (IOException ex) {
             System.out.println("IOException from connectToServer()");
         }
@@ -53,10 +61,9 @@ public class GameFrame implements KeyListener {
     public void newClient(int id, double x, double y) {
         int newClientId = id;
         if (newClientId != clientID) {
-            Player ally = new Player(26, (int)x, (int)y, true, canvas, null);
+            Player ally = new Player(26, (int)x, (int)y, true, canvas, this, entities);
             AnimationThread.addSprite(ally.getSprite());
             clients.put(newClientId, ally);
-            allies.add(ally);
         }
     }
 
@@ -119,7 +126,7 @@ public class GameFrame implements KeyListener {
                                     double dy = dataIn.readDouble();
                                     double angle = dataIn.readDouble();
                                     
-                                    new Bullet(type, x, y, dx, dy, angle, canvas);
+                                    new Bullet(type, x, y, dx, dy, angle, canvas, thisframe);
                                     break;
                             }
                         } else {
@@ -230,7 +237,7 @@ public class GameFrame implements KeyListener {
     }
 
     public void initPlayer() {
-        player = new Player(26, 0,0,false, canvas, this);
+        player = new Player(26, 0,0,false, canvas, this, entities);
         AnimationThread.addSprite(player.getSprite());
         canvas.focus(player);
         connectToServer();
@@ -241,17 +248,53 @@ public class GameFrame implements KeyListener {
         player.setY(0);
     }
 
+    public void addEntity(Entity en) {
+        if (addEntitySafe) {
+            synchronized(entities) {
+                entities.add(en);
+            }
+        } else {
+            entityQueue.add(en);
+        }
+    }
+    public void handleEntityQueue() {
+        for (Entity en : entityQueue) {
+            addEntity(en);
+        }
+        entityQueue.clear();
+    }
+    public void removeEntity(Entity en) {
+        if (addEntitySafe) {
+            synchronized(entities) {
+                entities.remove(en);
+            }
+        } else {
+            entityRemoveQueue.add(en);
+        }
+    }
+    public void handleEntityRemoveQueue() {
+        for (Entity en : entityRemoveQueue) {
+            entities.remove(en);
+        }
+        entityRemoveQueue.clear();
+    }
+
     public void tick() {
         long currentTime = System.currentTimeMillis();
         long deltaTime = currentTime - lastFrameTime;
-
-        player.update(deltaTime, curMap);
-        if (allies != null) {
-            for (Player ally : allies) {
-                ally.update(deltaTime, curMap);
+        synchronized(entities) {
+            addEntitySafe = false;
+            if (entities != null) {
+                for (Entity en : entities) {
+                    en.update(deltaTime, curMap);
+                }
             }
+            addEntitySafe = true;
+            canvas.tickObjects(deltaTime);
         }
-        canvas.tickObjects(deltaTime);
+        handleEntityQueue();
+        handleEntityRemoveQueue();
+
 
         lastFrameTime = currentTime;
     }

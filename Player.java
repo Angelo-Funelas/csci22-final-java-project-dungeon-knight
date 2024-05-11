@@ -14,8 +14,9 @@ public class Player implements GameObject, Entity {
     private ArrayList<Weapon> weapons;
     private GameCanvas canvas;
     private GameFrame frame;
+    private ArrayList<Entity> entities;
 
-    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame) {
+    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList<Entity> entities) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         sprite_frames.add(new File("sprites/rogue_frame_0.png"));
         sprite_frames.add(new File("sprites/rogue_frame_1.png"));
@@ -35,7 +36,7 @@ public class Player implements GameObject, Entity {
         dy = 0;
         acceleration = 30;
         maxSpeed = 200;
-        this.friction = 0.8;
+        friction = 0.8;
         zIndex = 1000000;
         width = sprite.getWidth();
         height = sprite.getHeight();
@@ -47,6 +48,7 @@ public class Player implements GameObject, Entity {
         curWeapon_i = 0;
         canvas.addGameObject(this);
         this.frame = frame;
+        frame.addEntity(this);
     }
 
     public double getX() {return x;}
@@ -125,7 +127,6 @@ public class Player implements GameObject, Entity {
         for (Weapon weapon : weapons) {
             weapon.update(dt);
         }
-
     }
 
     public void setUp(boolean b) {moveUp = b;}
