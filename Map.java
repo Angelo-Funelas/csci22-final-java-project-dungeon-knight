@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class Map {
@@ -20,7 +19,6 @@ public class Map {
 
     private class mapModelPiece {
         private ArrayList<mapModelPiece> paths;
-        private int tileWidth, tileHeight;
 
         public mapModelPiece() {
             paths = new ArrayList<mapModelPiece>(Arrays.asList(null, null, null, null));
@@ -33,21 +31,9 @@ public class Map {
         public mapModelPiece addPath(int dir) {
             mapModelPiece newRoom = new mapModelPiece();
             paths.set(dir, newRoom);
-            int oppositeDir = 0;
-            if (dir==0) {
-                oppositeDir = 1;
-            } else if (dir==1) {
-                oppositeDir = 0;
-            } else if (dir==2) {
-                oppositeDir = 3;
-            } else if (dir==3) {
-                oppositeDir = 2;
-            }
             return newRoom;
         }
         public int getRandomDir(Random r, ArrayList<ArrayList<mapModelPiece>> mapGrid, int x, int y) {
-            int available_i = 0;
-            int availableCount = 0;
             ArrayList<Integer> availableDirs = new ArrayList<Integer>();
 
             for (int i = 0; i < 4; i++) {
@@ -137,24 +123,6 @@ public class Map {
                     paths.get(i).generatePieces(newRoom, r, depth+1, maxDepth, map);
                 }
             }
-        }
-
-        public int getRandomOpenDoor(Random r) {
-            int available_i = 0;
-            int availableCount = 0;
-            for (int i = 0; i < 4; i++) {
-                if (paths.get(i)!=null) {
-                    availableCount++;
-                }
-            }
-            int[] availableDirs = new int[availableCount];
-            for (int i = 0; i<4; i++) {
-                if (paths.get(i)!=null) {
-                    availableDirs[available_i] = i;
-                    available_i++;
-                }
-            }
-            return availableDirs[r.nextInt(availableCount + 1)];
         }
     }
 
