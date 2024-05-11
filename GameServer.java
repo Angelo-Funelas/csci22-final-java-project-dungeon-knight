@@ -63,11 +63,10 @@ public class GameServer {
     }
 
     public synchronized void emitAll(String command, ArrayList<emitArg> args, int playerID) {
-        ArrayList<Client> emitClients = new ArrayList<Client>(clients);
         synchronized (clients) {
             if (emitAllReady) {
                 emitAllReady = false;
-                for (Client c : emitClients) {
+                for (Client c : clients) {
                     if (c.getID()!=playerID) {
                         c.emit(command, args);
                     }
