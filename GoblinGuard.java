@@ -72,10 +72,28 @@ public class GoblinGuard implements GameObject, Entity {
     }
 
     public void update(long dt, Map curMap) {
-        x += dx*dt/1000;
-        y += dy*dt/1000;
         dx *= friction;
         dy *= friction;
+        
+        x += dx*dt/1000;
+        y += dy*dt/1000;
+        collBoxes.get(0).setPos(x+4,y+2);
+
+        if (curMap!=null) {
+            for (CollisionBox box : curMap.getCollisionBoxes()) {
+                if (isColliding(box)) {
+                    x -= dx*dt/1000;
+                    y -= dy*dt/1000;
+                    if (box.getWidth()<box.getHeight()) {
+                        dx *= -1;
+                    } else {
+                        dy *= -1;
+                    }
+                    break;
+                }
+            }
+        }
+
         collBoxes.get(0).setPos(x+4,y+2);
     }
 

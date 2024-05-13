@@ -7,14 +7,12 @@ public class DungeonRoom extends DungeonPiece implements GameObject {
     private BufferedImage image;
     private int tileWidth, tileHeight, width, height;
     private int x,y,zIndex;
-    private GameCanvas canvas;
 
     public double getX() {return x;}
     public double getY() {return y;}
 
     public DungeonRoom(BufferedImage img, int zIndex,int tileWidth, int tileHeight, int x, int y, ArrayList<CollisionBox> collBoxes) {
         image = img;
-        this.canvas = canvas;
         this.zIndex = zIndex;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;

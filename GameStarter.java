@@ -1,7 +1,7 @@
 public class GameStarter {
     public static boolean debugMode;
     public static double zoom;
-    public static int framerate = 75;
+    public static int framerate = 60;
     public static String host;
     public static void main(String args[]) {
         try {

@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Player implements GameObject, Entity {
     private Sprite sprite;
-    private int scale, width, height, zIndex,curWeapon_i;
+    private int scale, width, height, zIndex,curWeapon_i, score;
     private double x,y,dx,dy,rdx,rdy,lastx,lasty,health;
     private long lastPing;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
@@ -17,6 +17,7 @@ public class Player implements GameObject, Entity {
     private GameFrame frame;
     private ArrayList<Entity> entities;
     private final int team = 0;
+    private long dt;
 
     public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, AnimationThread animationThread, ArrayList<Entity> entities) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -103,6 +104,7 @@ public class Player implements GameObject, Entity {
         }
         if (GameStarter.debugMode) {
             g2d.setPaint(debugColor);
+            g2d.drawString("dt: " + dt, (int)x, (int)y-14);
             g2d.drawString("X: " + (int)x, (int)x, (int)y-8);
             g2d.drawString("Y: " + (int)y, (int)x, (int)y-2);
             for (CollisionBox box : collBoxes) {
@@ -112,6 +114,7 @@ public class Player implements GameObject, Entity {
     }
 
     public void update(long dt, Map curMap) {
+        this.dt = dt;
         if (!ally) {
             if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
             if (moveDown) {dy += (double) (acceleration) * dt / 1000.0;}
@@ -151,10 +154,17 @@ public class Player implements GameObject, Entity {
             if (!collidedY) {
                 y += dy;
             }
-            collBoxes.get(0).setPos(x+4,y+5);
+            if (curMap!=null && !curMap.isEnded() && isColliding(curMap.getPortal().getCollisionBoxes().get(0))) {
+                curMap.end();
+                ArrayList<emitArg> args = new ArrayList<emitArg>();
+                frame.sendCommand("reachedEnd", args);
+                curMap.getPortal().destroy();
+                curMap.clearPortal();
+                System.out.println("test");
+            }
         } else {
-            dx *= friction;
-            dy *= friction;
+            rdx *= friction;
+            rdy *= friction;
             x += rdx*dt;
             y += rdy*dt;
             long currentTime = System.currentTimeMillis();
@@ -162,6 +172,7 @@ public class Player implements GameObject, Entity {
                 destroy();
             }
         }
+        collBoxes.get(0).setPos(x+4,y+5);
         for (Weapon weapon : weapons) {
             weapon.update(dt, curMap);
         }

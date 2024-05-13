@@ -2,17 +2,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import javax.sound.sampled.Port;
+
 public class Map {
     private ArrayList<DungeonPiece> mapPieces;
     private GameCanvas canvas;
+    private GameFrame frame;
+    private AnimationThread animationThread;
     private final String[] dirs = {"up","down","left","right"};
-    private boolean endRoomGenerated;
+    private boolean endRoomGenerated, isEnded;
+    private Portal endPortal;
 
-    public Map(int gridRods, int gridHeight, GameCanvas canvas, int seed) {
+    public Map(int gridRods, int gridHeight, GameCanvas canvas, GameFrame frame, int seed, AnimationThread animationThread) {
         this.canvas = canvas;
         mapPieces = new ArrayList<DungeonPiece>();
         Random random = new Random(seed);
         endRoomGenerated = false;
+        this.animationThread = animationThread;
+        this.frame = frame;
 
         boolean[] doors = new boolean[4];
         int doorOpening = random.nextInt(4);
@@ -159,11 +166,36 @@ public class Map {
                         }
                     }
 
+
                     DungeonRoom newRoom = rootRoom.attach(dirs[i], roomSize, roomSize, newRmDoors, r, canvas, map);
                     System.out.println("attaching room " + dirs[i]);
+
+                    if (i==endRoom) {
+                        endPortal = new Portal(30, (int)newRoom.getX()+(newRoom.getWidth()/2)-15, (int)newRoom.getY()+(newRoom.getHeight()/2)-15, canvas, animationThread);
+                    } else {
+                        int enemyCount = r.nextInt(6 + 1) + 1;
+                        for (int e=0;e<enemyCount;e++) {
+                            int spawn_x = (int)newRoom.getX()+r.nextInt(newRoom.getWidth()-16) + 16;
+                            int spawn_y = (int)newRoom.getY()+r.nextInt(newRoom.getHeight()-24) + 24;
+                            GoblinGuard newEnemy = new GoblinGuard(canvas, frame, spawn_x, spawn_y, animationThread);
+                        }
+                    }
+                    
                     paths.get(i).generatePieces(newRoom, r, depth+1, maxDepth, map);
                 }
             }
         }
+    }
+    public Portal getPortal() {
+        return endPortal;
+    }
+    public void clearPortal() {
+        endPortal = null;
+    }
+    public void end() {
+        isEnded = true;
+    }
+    public boolean isEnded() {
+        return isEnded;
     }
 }

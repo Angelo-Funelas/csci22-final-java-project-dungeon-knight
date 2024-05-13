@@ -65,6 +65,7 @@ public class GameServer {
                     Socket s = ss.accept();
                     Client newClient =  new Client(s, clients);
                     clients.add(newClient);
+                    holdSeedReset = false;
                 }
             } catch (IOException ex) {
                 System.out.println("IOException from acceptConnections()");
@@ -230,6 +231,7 @@ public class GameServer {
                         System.out.println("Resynced stream");
                     }
                     if (command.startsWith("com_")) {
+                        ArrayList<emitArg> args;
                         switch (command) {
                             case "com_setPos":
                                 c.getPlayer().setX(dataIn.readDouble());
@@ -241,7 +243,7 @@ public class GameServer {
                                 c.getPlayer().setAngle(dataIn.readDouble());
                                 break;
                             case "com_newBullet":
-                                ArrayList<emitArg> args = new ArrayList<emitArg>();
+                                args = new ArrayList<emitArg>();
                                 args.add(new emitArg("utf", dataIn.readUTF()));
                                 args.add(new emitArg("double", dataIn.readDouble()));
                                 args.add(new emitArg("double", dataIn.readDouble()));
@@ -251,6 +253,13 @@ public class GameServer {
                                 args.add(new emitArg("double", dataIn.readDouble()));
                                 emitAll("newBullet", args, playerID);
                                 System.out.println("sent new bullet");
+                                break;
+                            case "com_reachedEnd":
+                                curSeed = generateSeed();
+                                args = new ArrayList<emitArg>();
+                                args.add(new emitArg("int", curSeed));
+                                emitAll("setSeed", args, -1);
+                                System.out.println("Reached end!");
                                 break;
                         } 
                     }

@@ -307,7 +307,7 @@ public class GameFrame implements KeyListener {
         connectToServer();
     }
     public void prepareLevel(int seed) {
-        curMap = new Map(3, 3, canvas, seed);
+        curMap = new Map(3, 3, canvas, this, seed, AnimationThread);
         if (seed!=lastSeed) {
             player.setX(0);
             player.setY(0);
