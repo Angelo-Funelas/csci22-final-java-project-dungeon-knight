@@ -6,4 +6,5 @@ public abstract class DungeonPiece {
     public ArrayList<CollisionBox> getCollisionBoxes() {
         return collBoxes;
     }
+    public void destroy(GameCanvas canvas) {}
 }

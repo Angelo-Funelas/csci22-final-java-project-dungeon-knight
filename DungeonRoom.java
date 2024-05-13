@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class DungeonRoom extends DungeonPiece implements GameObject {
-    BufferedImage image;
-    int tileWidth, tileHeight, width, height;
-    int x,y,zIndex;
+    private BufferedImage image;
+    private int tileWidth, tileHeight, width, height;
+    private int x,y,zIndex;
+    private GameCanvas canvas;
 
     public double getX() {return x;}
     public double getY() {return y;}
 
     public DungeonRoom(BufferedImage img, int zIndex,int tileWidth, int tileHeight, int x, int y, ArrayList<CollisionBox> collBoxes) {
         image = img;
+        this.canvas = canvas;
         this.zIndex = zIndex;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
@@ -34,6 +36,13 @@ public class DungeonRoom extends DungeonPiece implements GameObject {
             }
         }
     }
+    
+    public void destroy(GameCanvas canvas) {
+        System.out.println("removing dungeon room");
+        canvas.removeGameObject(this);
+        System.out.println("removed dungeon room");
+    }
+
     public int[] getRoomCenter() {
         int[] res = {x+(width/2), y+(height/2)};
         return res;
@@ -41,18 +50,13 @@ public class DungeonRoom extends DungeonPiece implements GameObject {
 
     public int getWidth() {return width;}
     public int getHeight() {return height;}
-
     public void setX(int x) {this.x = x;}
     public void setY(int y) {this.y = y;}
-
-    public int getHallLength() {
-        return (27-this.tileHeight)/2;
-    }
+    public int getHallLength() {return (27-this.tileHeight)/2;}
 
     public boolean isColliding(CollisionBox other) {return false;}
-    public int getZIndex() {
-        return zIndex;
-    }
+    public int getZIndex() {return zIndex;}
+    
     @Override
     public int compareTo(GameObject other) {
         return Integer.compare(this.getZIndex(), other.getZIndex());

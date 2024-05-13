@@ -34,10 +34,17 @@ public class DungeonHall extends DungeonPiece implements GameObject  {
         }
     }
 
+    public void destroy(GameCanvas canvas) {
+        System.out.println("removing dungeon hall");
+        canvas.removeGameObject(this);
+        System.out.println("removed dungeon hall");
+    }
+
     public int[] getRoomCenter() {
         int[] res = {x+(scaleX/2), y+(scaleY/2)};
         return res;
     } 
+
     public int getWidth() {return width;}
     public int getHeight() {return height;}
     public boolean isColliding(CollisionBox other) {return false;}

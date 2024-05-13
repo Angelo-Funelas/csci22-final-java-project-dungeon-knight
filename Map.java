@@ -8,6 +8,48 @@ public class Map {
     private final String[] dirs = {"up","down","left","right"};
     private boolean endRoomGenerated;
 
+    public Map(int gridRods, int gridHeight, GameCanvas canvas, int seed) {
+        this.canvas = canvas;
+        mapPieces = new ArrayList<DungeonPiece>();
+        Random random = new Random(seed);
+        endRoomGenerated = false;
+
+        boolean[] doors = new boolean[4];
+        int doorOpening = random.nextInt(4);
+        Arrays.fill(doors, false);
+        doors[doorOpening] = true;
+
+        int maxDepth = 3;
+        int gridSize = 1+maxDepth*2;
+        ArrayList<ArrayList<mapModelPiece>> mapGrid = new ArrayList<ArrayList<mapModelPiece>>();
+
+        // Populate the grid with null values
+        for (int i = 0; i < gridSize; i++) {
+            ArrayList<mapModelPiece> row = new ArrayList<>(gridSize);
+            for (int j = 0; j < gridSize; j++) {
+                row.add(null);
+            }
+            mapGrid.add(row);
+        }
+
+        mapModelPiece rootRoom = new mapModelPiece();
+        mapGrid.get(maxDepth).set(maxDepth, rootRoom);
+
+        rootRoom.generatePaths(random, 0, maxDepth, mapGrid, maxDepth, maxDepth);
+        rootRoom.generatePieces(null, random, 0, maxDepth, this);
+    }
+
+    public void destroy() {
+        for (DungeonPiece piece : mapPieces) {
+            piece.destroy(canvas);
+        }
+        mapPieces.clear();
+    }
+
+    public void addPiece(DungeonPiece piece) {
+        mapPieces.add(piece);
+    }
+
     public ArrayList<CollisionBox> getCollisionBoxes() {
         ArrayList<CollisionBox> res = new ArrayList<CollisionBox>();
         for (DungeonPiece piece : mapPieces) {
@@ -123,40 +165,5 @@ public class Map {
                 }
             }
         }
-    }
-
-    public Map(int gridRods, int gridHeight, GameCanvas canvas, int seed) {
-        this.canvas = canvas;
-        mapPieces = new ArrayList<DungeonPiece>();
-        Random random = new Random(seed);
-        endRoomGenerated = false;
-
-        boolean[] doors = new boolean[4];
-        int doorOpening = random.nextInt(4);
-        Arrays.fill(doors, false);
-        doors[doorOpening] = true;
-
-        int maxDepth = 3;
-        int gridSize = 1+maxDepth*2;
-        ArrayList<ArrayList<mapModelPiece>> mapGrid = new ArrayList<ArrayList<mapModelPiece>>();
-
-        // Populate the grid with null values
-        for (int i = 0; i < gridSize; i++) {
-            ArrayList<mapModelPiece> row = new ArrayList<>(gridSize);
-            for (int j = 0; j < gridSize; j++) {
-                row.add(null);
-            }
-            mapGrid.add(row);
-        }
-
-        mapModelPiece rootRoom = new mapModelPiece();
-        mapGrid.get(maxDepth).set(maxDepth, rootRoom);
-
-        rootRoom.generatePaths(random, 0, maxDepth, mapGrid, maxDepth, maxDepth);
-        rootRoom.generatePieces(null, random, 0, maxDepth, this);
-    }
-
-    public void addPiece(DungeonPiece piece) {
-        mapPieces.add(piece);
     }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class GoblinGuard implements GameObject, Entity {
     private Sprite sprite;
     private int scale, width, height, zIndex;
-    private double x,y,dx,dy, lastx,lasty;
+    private double x,y,dx,dy, lastx,lasty, health;
     private long lastPing;
     private boolean moveUp, moveDown, moveLeft, moveRight, ally;
     private ArrayList<CollisionBox> collBoxes;
@@ -13,6 +13,8 @@ public class GoblinGuard implements GameObject, Entity {
     private GameFrame frame;
     private ArrayList<Entity> entities;
     private Weapon weapon;
+    private final int team = 1;
+    private final double friction = 0.8;
 
     public GoblinGuard(GameCanvas canvas, GameFrame frame, double x, double y, AnimationThread animationThread) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
@@ -23,11 +25,17 @@ public class GoblinGuard implements GameObject, Entity {
         this.frame = frame;
         this.x = x;
         this.y = y;
+        this.dx = 0;
+        this.dy = 0;
         scale = 25;
         zIndex = 999999;
+        collBoxes = new ArrayList<CollisionBox>();
+        CollisionBox collBox = new CollisionBox(x+4, y+2, scale-8, scale-2);
+        collBoxes.add(collBox);
         frame.addEntity(this);
         canvas.addGameObject(this);
         animationThread.addSprite(sprite);
+        health = 10;
     }
 
     public double getX() {return x;}
@@ -52,9 +60,28 @@ public class GoblinGuard implements GameObject, Entity {
     public boolean isColliding(CollisionBox other) {return collBoxes.get(0).isColliding(other);}
     public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {return collBoxes.get(0).isColliding(other, offsetX, offsetY);}
     public int getZIndex() {return zIndex;}
+    public int getTeam() {return team;}
+
+    public double damage(double dmg) {
+        health -= dmg;
+        double healthTemp = health;
+        if (health<=0) {
+            destroy();
+        }
+        return healthTemp;
+    }
 
     public void update(long dt, Map curMap) {
+        x += dx*dt/1000;
+        y += dy*dt/1000;
+        dx *= friction;
+        dy *= friction;
+        collBoxes.get(0).setPos(x+4,y+2);
+    }
 
+    public void destroy() {
+        canvas.removeGameObject(this);
+        frame.removeEntity(this);
     }
 
     public void draw(Graphics2D g2d) {

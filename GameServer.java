@@ -1,5 +1,6 @@
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
@@ -7,9 +8,11 @@ import java.io.*;
 public class GameServer {
     private ServerSocket ss;
     private ArrayList<Client> clients;
-    private int maxClients = 4;
-    private int port = 55555;
+    private final int maxClients = 4;
+    private final int port = 55555;
     private static boolean emitAllReady;
+    private int curSeed;
+    private boolean holdSeedReset;
 
     public GameServer() {
         System.out.println("==== Dungeon Knight Server ====");
@@ -21,6 +24,14 @@ public class GameServer {
         }
         clients = new ArrayList<Client>();
         emitAllReady = true;
+        curSeed = 0;
+        holdSeedReset = false;
+    }
+
+    public static int generateSeed() {
+        Random random = new Random();
+        int seed = 100000000 + (random.nextInt(900000000));
+        return seed;
     }
 
     public static void main(String[] args) {
@@ -159,6 +170,12 @@ public class GameServer {
                 wtc = new WriteToClient(this, outputStream);
 
                 wtc.sendClientID();
+
+                if (clients.size()==0 && !holdSeedReset) {
+                    curSeed = generateSeed();
+                }
+                wtc.sendSeed();
+
                 player = new Player();
 
                 readThread = new Thread(rfc); 
@@ -231,6 +248,7 @@ public class GameServer {
                                 args.add(new emitArg("double", dataIn.readDouble()));
                                 args.add(new emitArg("double", dataIn.readDouble()));
                                 args.add(new emitArg("double", dataIn.readDouble()));
+                                args.add(new emitArg("double", dataIn.readDouble()));
                                 emitAll("newBullet", args, playerID);
                                 System.out.println("sent new bullet");
                                 break;
@@ -239,6 +257,7 @@ public class GameServer {
                 } catch (UTFDataFormatException ex) {
                     System.out.println("IOException from ReadFromServer Thread: " + ex);
                     System.out.println("Client #"+c.getID()+" desynced streams, attempting reconnection... disconnecting");
+                    holdSeedReset = true;
                     c.disconnectClient();
                 } catch (IOException ex) {
                     System.out.println("IOException from ReadFromServer Thread: " + ex);
@@ -256,10 +275,6 @@ public class GameServer {
                 }
             }
         }
-    }
-
-    public void generateMap() {
-        
     }
 
     private class WriteToClient implements Runnable {
@@ -307,6 +322,11 @@ public class GameServer {
             ArrayList<emitArg> args = new ArrayList<emitArg>();
             args.add(new emitArg("int", playerID));
             sendCommand("setID", args);
+        }
+        public void sendSeed() {
+            ArrayList<emitArg> args = new ArrayList<emitArg>();
+            args.add(new emitArg("int", curSeed));
+            sendCommand("setSeed", args);
         }
 
         public void run() {

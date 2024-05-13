@@ -25,7 +25,6 @@ public class GameStarter {
         game.setUpGUI();
         game.startAnimationThread();
         game.initPlayer();
-        game.prepareLevel();
         game.startGameLoop();
     }
 }

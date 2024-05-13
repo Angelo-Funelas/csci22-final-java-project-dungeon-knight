@@ -28,6 +28,7 @@ public class GameFrame implements KeyListener {
     private GameFrame thisframe;
     private DataInputStream dataInpStream;
     private DataOutputStream dataOutStream;
+    private int lastSeed;
 
 
     public GameFrame() {
@@ -39,6 +40,7 @@ public class GameFrame implements KeyListener {
         addEntitySafe = true;
         connectedToServer = false;
         clientID = -1;
+        lastSeed = 0;
     }
 
     private void connectToServer() {
@@ -129,6 +131,15 @@ public class GameFrame implements KeyListener {
                                     System.out.println("Connected to server as Client #" + clientID);
                                     frame.setTitle(String.format("Final Project - Dungeon Knight (Client #%d)", clientID));
                                     break;
+                                case "com_setSeed":
+                                    int seed = dataIn.readInt();
+                                    System.out.println("Generating map with seed " + seed);
+                                    if (curMap!=null) {
+                                        System.out.println("destroying old map");
+                                        curMap.destroy();
+                                    }
+                                    prepareLevel(seed);
+                                    break;
                                 case "com_setAllyPos":
                                     int targetID = dataIn.readInt();
                                     double data_x = dataIn.readDouble();
@@ -147,8 +158,8 @@ public class GameFrame implements KeyListener {
                                             if (targetAlly.getlX()!=data_x||targetAlly.getlY()!=data_y||targetAlly.getWeapon().getAngle()!=data_angle) {
                                                 targetAlly.setX(data_x);
                                                 targetAlly.setY(data_y);
-                                                targetAlly.setDx(data_dx);
-                                                targetAlly.setDy(data_dy);
+                                                targetAlly.setRdx(data_dx);
+                                                targetAlly.setRdy(data_dy);
                                                 if (data_faceDir == -1) {targetAlly.getSprite().faceLeft();} else {targetAlly.getSprite().faceRight();}
                                                 targetAlly.getSprite().setWalking(data_isWalking);;
                                                 targetAlly.getWeapon().setAngle(data_angle);
@@ -165,8 +176,9 @@ public class GameFrame implements KeyListener {
                                     double dx = dataIn.readDouble();
                                     double dy = dataIn.readDouble();
                                     double angle = dataIn.readDouble();
+                                    double dmg = dataIn.readDouble();
                                     
-                                    new Bullet(type, x, y, dx, dy, angle, canvas, thisframe);
+                                    new Bullet(type, x, y, dx, dy, angle, canvas, thisframe, entities, 0, dmg);
                                     break;
                             }
                         } else {
@@ -231,8 +243,8 @@ public class GameFrame implements KeyListener {
             ArrayList<emitArg> args = new ArrayList<emitArg>();
             args.add(new emitArg("double", player.getX()));
             args.add(new emitArg("double", player.getY()));
-            args.add(new emitArg("double", player.getDx()));
-            args.add(new emitArg("double", player.getDy()));
+            args.add(new emitArg("double", player.getRdx()));
+            args.add(new emitArg("double", player.getRdy()));
             args.add(new emitArg("int", player.getSprite().getFaceDir()));
             args.add(new emitArg("boolean", player.getSprite().isWalkingBool()));
             args.add(new emitArg("double", player.getWeapon().getAngle()));
@@ -294,10 +306,13 @@ public class GameFrame implements KeyListener {
         GoblinGuard test = new GoblinGuard(canvas, this, 0, 0, AnimationThread);
         connectToServer();
     }
-    public void prepareLevel() {
-        curMap = new Map(3, 3, canvas, 123456789);
-        player.setX(0);
-        player.setY(0);
+    public void prepareLevel(int seed) {
+        curMap = new Map(3, 3, canvas, seed);
+        if (seed!=lastSeed) {
+            player.setX(0);
+            player.setY(0);
+            lastSeed = seed;
+        }
     }
 
     public void addEntity(Entity en) {

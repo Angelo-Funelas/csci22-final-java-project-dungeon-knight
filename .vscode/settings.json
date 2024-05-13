@@ -1,5 +1,6 @@
 {
     "files.exclude": {
-        "**/*.class": true
+        "**/*.class": true,
+        "**/*.bat": true
     }
 }

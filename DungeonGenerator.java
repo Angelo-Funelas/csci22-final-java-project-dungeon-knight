@@ -10,8 +10,6 @@ public class DungeonGenerator {
     private static ArrayList<BufferedImage> mapList = new ArrayList<BufferedImage>();
     private static int wallThickness = 12;
 
-    private DungeonGenerator() {} // make an empty private constructor to prevent it from being instantiated
-
     static { // initialize sprites
         ArrayList<File> spriteSrcs = new ArrayList<File>();
         spriteSrcs.add(new File("tiles/floor0.png"));

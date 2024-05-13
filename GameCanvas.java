@@ -34,7 +34,6 @@ public class GameCanvas extends JComponent {
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     isLeftButtonPressed = true;
-                    System.out.println("Left Mouse Button Pressed");
                 }
             }
 
@@ -42,7 +41,6 @@ public class GameCanvas extends JComponent {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     isLeftButtonPressed = false;
-                    System.out.println("Left Mouse Button Released");
                 }
             }
         });

@@ -6,24 +6,27 @@ public class RangedWeap extends Weapon implements GameObject {
     private double rateOfFire, bulletSpeed; // per second
     private Sprite sprite;
     private int width, height, zIndex, xOffset;
-    private double x,y,lastAngle;
+    private double x,y,lastAngle, dmg;
     private Player parent;
     private boolean ally;
     private GameCanvas canvas;
     private GameFrame frame;
+    private ArrayList<Entity> entities;
 
-    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame) {
+    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList entities) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         switch (type) {
             case "badPistol":
                 sprite_frames.add(new File("sprites/badPistol.png"));
+                this.dmg = 2.5;
                 break;
             default:
                 sprite_frames.add(new File("sprites/badPistol.png"));
+                this.dmg = 2.5;
                 break;
         }
         sprite = new Sprite(sprite_frames, -1);
-        zIndex = 1000001;
+        zIndex = 1000005;
         this.parent = parent;
         x = parent.getWidth()*.5;
         y = parent.getWidth()*.5;
@@ -34,6 +37,7 @@ public class RangedWeap extends Weapon implements GameObject {
         this.canvas = canvas;
         rateOfFire = 2;
         this.frame = frame;
+        this.entities = entities;
     }
 
     public double getX() {return x;}
@@ -96,9 +100,10 @@ public class RangedWeap extends Weapon implements GameObject {
             args.add(new emitArg("double", dx));
             args.add(new emitArg("double", dy));
             args.add(new emitArg("double", angle));
+            args.add(new emitArg("double", dmg));
             frame.sendCommand("newBullet", args);
         }
-        new Bullet("player", x+xOffset, y, dx, dy, angle, canvas, frame);
+        new Bullet("player", x+xOffset, y, dx, dy, angle, canvas, frame, entities, 0, dmg);
     }
 
     public void draw(Graphics2D g2d) {
