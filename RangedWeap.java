@@ -13,7 +13,7 @@ public class RangedWeap extends Weapon implements GameObject {
     private GameFrame frame;
     private ArrayList<Entity> entities;
 
-    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList entities) {
+    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList<Entity> entities) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         switch (type) {
             case "badPistol":
