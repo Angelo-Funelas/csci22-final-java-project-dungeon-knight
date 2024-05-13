@@ -22,7 +22,7 @@ public class RangedWeap extends Weapon implements GameObject {
                 sprite_frames.add(new File("sprites/badPistol.png"));
                 break;
         }
-        sprite = new Sprite(sprite_frames);
+        sprite = new Sprite(sprite_frames, -1);
         zIndex = 1000001;
         this.parent = parent;
         x = parent.getWidth()*.5;
@@ -47,7 +47,7 @@ public class RangedWeap extends Weapon implements GameObject {
     public ArrayList<CollisionBox> getCollisionBoxes() {return null;}
     public boolean isColliding(CollisionBox other) {return false;}
 
-    public void update(long dt) {
+    public void update(long dt, Map curMap) {
         x = parent.getX()+parent.getWidth()*.5;
         y = parent.getY()+parent.getHeight()*.5;
         if (!ally) {
@@ -98,7 +98,6 @@ public class RangedWeap extends Weapon implements GameObject {
             args.add(new emitArg("double", angle));
             frame.sendCommand("newBullet", args);
         }
-
         new Bullet("player", x+xOffset, y, dx, dy, angle, canvas, frame);
     }
 

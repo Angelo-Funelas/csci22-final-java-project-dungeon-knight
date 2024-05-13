@@ -2,15 +2,15 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class DrawThread extends Thread {
-    GameCanvas c;
+    GameCanvas canvas;
     public DrawThread(GameCanvas c) {
-        this.c = c;
+        this.canvas = c;
     }
     public void run() {
         Timer timer = new Timer(1000/GameStarter.framerate, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                c.repaint();
+                canvas.repaint();
             }
         });
         timer.start();

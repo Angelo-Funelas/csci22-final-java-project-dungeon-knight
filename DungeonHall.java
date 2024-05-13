@@ -38,9 +38,6 @@ public class DungeonHall extends DungeonPiece implements GameObject  {
         int[] res = {x+(scaleX/2), y+(scaleY/2)};
         return res;
     } 
-
-    public void update(long dt) {};
-
     public int getWidth() {return width;}
     public int getHeight() {return height;}
     public boolean isColliding(CollisionBox other) {return false;}

@@ -17,7 +17,7 @@ public class Player implements GameObject, Entity {
     private GameFrame frame;
     private ArrayList<Entity> entities;
 
-    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList<Entity> entities) {
+    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, AnimationThread animationThread, ArrayList<Entity> entities) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         sprite_frames.add(new File("sprites/rogue_frame_0.png"));
         sprite_frames.add(new File("sprites/rogue_frame_1.png"));
@@ -27,7 +27,7 @@ public class Player implements GameObject, Entity {
         sprite_frames.add(new File("sprites/rogue_frame_5.png"));
         sprite_frames.add(new File("sprites/rogue_frame_6.png"));
         sprite_frames.add(new File("sprites/rogue_frame_7.png"));
-        sprite = new Sprite(sprite_frames);
+        sprite = new Sprite(sprite_frames, -1);
         this.scale = scale;
         this.ally = ally;
         this.canvas = canvas;
@@ -52,12 +52,12 @@ public class Player implements GameObject, Entity {
         this.frame = frame;
         frame.addEntity(this);
         lastPing = System.currentTimeMillis();
+        animationThread.addSprite(sprite);
     }
 
-    public void ping() {
-        lastPing = System.currentTimeMillis();
-    }
+    public void ping() {lastPing = System.currentTimeMillis();}
 
+    // getters and setters
     public double getX() {return x;}
     public double getY() {return y;}
     public double getlX() {return lastx;}
@@ -69,6 +69,18 @@ public class Player implements GameObject, Entity {
     public void setDx(double dx) {this.dx = dx;}
     public void setDy(double dy) {this.dy = dy;}
     public Weapon getWeapon() {return weapons.get(curWeapon_i);}
+    public Sprite getSprite() {return sprite;}
+    public void setUp(boolean b) {moveUp = b;}
+    public void setDown(boolean b) {moveDown = b;}
+    public void setLeft(boolean b) {moveLeft = b;}
+    public void setRight(boolean b) {moveRight = b;}
+    public int getWidth() {return width;}
+    public int getHeight() {return height;}
+    public ArrayList<CollisionBox> getCollisionBoxes() {return collBoxes;}
+    public boolean isColliding(CollisionBox other) {return collBoxes.get(0).isColliding(other);}
+    public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {return collBoxes.get(0).isColliding(other, offsetX, offsetY);}
+    public int getZIndex() {return zIndex;}
+
 
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, scale, x,y);
@@ -85,11 +97,6 @@ public class Player implements GameObject, Entity {
         }
     }
 
-    public Sprite getSprite() {
-        return sprite;
-    }
-    // sqrt((speed*speed)/2) = a
-    public void update(long dt) {}
     public void update(long dt, Map curMap) {
         if (!ally) {
             if (moveUp) {dy += (double) (-acceleration) * dt / 1000.0;}
@@ -139,33 +146,10 @@ public class Player implements GameObject, Entity {
             }
         }
         for (Weapon weapon : weapons) {
-            weapon.update(dt);
+            weapon.update(dt, curMap);
         }
     }
 
-    public void setUp(boolean b) {moveUp = b;}
-    public void setDown(boolean b) {moveDown = b;}
-    public void setLeft(boolean b) {moveLeft = b;}
-    public void setRight(boolean b) {moveRight = b;}
-
-    public int getWidth() {return width;}
-    public int getHeight() {return height;}
-
-    public ArrayList<CollisionBox> getCollisionBoxes() {
-        return collBoxes;
-    }
-
-    public boolean isColliding(CollisionBox other) {
-        return collBoxes.get(0).isColliding(other);
-    }
-
-    public boolean isColliding(CollisionBox other, double offsetX, double offsetY) {
-        return collBoxes.get(0).isColliding(other, offsetX, offsetY);
-    }
-
-    public int getZIndex() {
-        return zIndex;
-    }
     @Override
     public int compareTo(GameObject other) {
         return Integer.compare(this.getZIndex(), other.getZIndex());

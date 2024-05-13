@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 public class CollisionBox {
     private double x,y;
     private int width, height;
-    static Color debugColor = new Color(194,62,68,160);
+    private static Color debugColor = new Color(194,62,68,160);
 
     public CollisionBox(double x, double y, int width, int height) {
         this.x = x;
@@ -29,6 +29,7 @@ public class CollisionBox {
     public void setY(double y) {this.y = y;}
     public int getWidth() {return width;}
     public int getHeight() {return height;}
+    
     public boolean isColliding(CollisionBox other) {
         double x1, x2, y1, y2; 
         x1 = x;

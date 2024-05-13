@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class AnimationThread extends Thread {
-    ArrayList<Sprite> sprites;
+    private ArrayList<Sprite> sprites;
     public AnimationThread() {
         sprites = new ArrayList<Sprite>(); 
     }
@@ -13,7 +13,7 @@ public class AnimationThread extends Thread {
             public void actionPerformed(ActionEvent ae) {
                 synchronized (sprites) {
                     for (Sprite sprite : sprites) {
-                        sprite.update();
+                        sprite.animate();
                     }
                 }
             }

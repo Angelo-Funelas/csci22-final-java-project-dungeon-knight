@@ -26,8 +26,8 @@ public class GameFrame implements KeyListener {
     private WriteToServer wtsRunnable;
     private Thread readThread, writeThread;
     private GameFrame thisframe;
-    DataInputStream dataInpStream;
-    DataOutputStream dataOutStream;
+    private DataInputStream dataInpStream;
+    private DataOutputStream dataOutStream;
 
 
     public GameFrame() {
@@ -73,8 +73,7 @@ public class GameFrame implements KeyListener {
         System.out.println("Client #" + id + " joined!");
         int newClientId = id;
         if (newClientId != clientID) {
-            Player ally = new Player(26, (int)x, (int)y, true, canvas, this, entities);
-            AnimationThread.addSprite(ally.getSprite());
+            Player ally = new Player(26, (int)x, (int)y, true, canvas, this, AnimationThread, entities);
             clients.put(newClientId, ally);
         }
     }
@@ -290,9 +289,9 @@ public class GameFrame implements KeyListener {
     }
 
     public void initPlayer() {
-        player = new Player(26, 0,0,false, canvas, this, entities);
-        AnimationThread.addSprite(player.getSprite());
+        player = new Player(26, 0,0,false, canvas, this, AnimationThread, entities);
         canvas.focus(player);
+        GoblinGuard test = new GoblinGuard(canvas, this, 0, 0, AnimationThread);
         connectToServer();
     }
     public void prepareLevel() {
@@ -347,7 +346,6 @@ public class GameFrame implements KeyListener {
                 }
             }
             addEntitySafe = true;
-            canvas.tickObjects(deltaTime);
         }
         handleEntityQueue();
         handleEntityRemoveQueue();

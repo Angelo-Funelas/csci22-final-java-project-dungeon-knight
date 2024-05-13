@@ -28,7 +28,7 @@ public class Bullet implements GameObject, Entity {
                 width = 0;
                 height = 0;
         }
-        sprite = new Sprite(sprite_frames);
+        sprite = new Sprite(sprite_frames, -1);
         sprite.setAngle(angle);
         zIndex = 1000001;
         this.canvas = canvas;
@@ -38,7 +38,6 @@ public class Bullet implements GameObject, Entity {
         collBoxes = new ArrayList<CollisionBox>();
         collBoxes.add(new CollisionBox(x+3, y+3, 7, 7));
     }
-    public void update(long dt) {}
     public void update(long dt, Map curMap) {
         x += dx*dt/1000;
         y += dy*dt/1000;

@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class DungeonGenerator {
     private static ArrayList<BufferedImage> mapList = new ArrayList<BufferedImage>();
-    static int wallThickness = 12;
+    private static int wallThickness = 12;
 
     private DungeonGenerator() {} // make an empty private constructor to prevent it from being instantiated
 
@@ -29,7 +29,7 @@ public class DungeonGenerator {
                 System.out.println("Can't find tiles");
             }
         }
-    } // bridges - 21, 2 small - 26
+    }
 
     public static BufferedImage getRandomSprite(Random r, int min, int max) {
         return mapList.get(r.nextInt(max - min + 1)+min);
@@ -65,6 +65,7 @@ public class DungeonGenerator {
                 }
             }
         }
+
         // Generate Walls
         for (int y = 0; y < tileHeight; y++) {
             for (int x = 0; x < tileWidth; x++) {
@@ -118,22 +119,16 @@ public class DungeonGenerator {
 
         int wallHeight = (areaHeight-16-wallThickness*2)/2-(doorWidth/2); 
         if (!doorLeft) {
-            CollisionBox wallTop = new CollisionBox(0,wallThickness,wallThickness,areaHeight-(16+wallThickness+wallThickness));
-            collBoxes.add(wallTop);
+            collBoxes.add(new CollisionBox(0,wallThickness,wallThickness,areaHeight-(16+wallThickness+wallThickness)));
         } else {
-            CollisionBox wallTopT = new CollisionBox(0,wallThickness,wallThickness, wallHeight-4);
-            CollisionBox wallTopB = new CollisionBox(0,wallThickness+wallHeight+doorWidth+4,wallThickness, wallHeight-4);
-            collBoxes.add(wallTopT);
-            collBoxes.add(wallTopB);
+            collBoxes.add(new CollisionBox(0,wallThickness,wallThickness, wallHeight-4));
+            collBoxes.add(new CollisionBox(0,wallThickness+wallHeight+doorWidth+4,wallThickness, wallHeight-4));
         }
         if (!doorRight) {
-            CollisionBox wallTop = new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness,areaHeight-(16+wallThickness*2));
-            collBoxes.add(wallTop);
+            collBoxes.add(new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness,areaHeight-(16+wallThickness*2)));
         } else {
-            CollisionBox wallTopT = new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness, wallHeight-4);
-            CollisionBox wallTopB = new CollisionBox(areaWidth-wallThickness,wallThickness+wallHeight+doorWidth+4,wallThickness, wallHeight-4);
-            collBoxes.add(wallTopT);
-            collBoxes.add(wallTopB);
+            collBoxes.add(new CollisionBox(areaWidth-wallThickness,wallThickness,wallThickness, wallHeight-4));
+            collBoxes.add(new CollisionBox(areaWidth-wallThickness,wallThickness+wallHeight+doorWidth+4,wallThickness, wallHeight-4));
         }
         g2d.dispose();
         DungeonRoom dungeon1Obj = new DungeonRoom(combinedImage, gridY, tileWidth, tileHeight, gridX, gridY, collBoxes);

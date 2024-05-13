@@ -9,13 +9,13 @@ public class Sprite {
     private ArrayList<BufferedImage> frames;
     private BufferedImage cur_sprite;
     private int sprite_i;
-    private int width, height, scaleY;
+    private int width, height, scaleY, animInterval, animI;
     private int faceDir = 1;
     private boolean isWalking;
     private double maxJumpHeight, jheight;
     private double angle;
 
-    public Sprite(ArrayList<File> frames) {
+    public Sprite(ArrayList<File> frames, int animInterval) {
         ArrayList<BufferedImage> new_frames = new ArrayList<BufferedImage>();
         for (File file : frames) {
             try {
@@ -32,17 +32,24 @@ public class Sprite {
         maxJumpHeight = 2;
         angle = 0;
         scaleY = 1;
+        this.animInterval = animInterval;
+        animI = 0;
     }
     public double getJheight() {
         return jheight;
     }
-    public void update() {
-        sprite_i = (sprite_i+=1)%frames.size();
-        cur_sprite = frames.get(sprite_i);
-        if (isWalking) {
-            jheight = (maxJumpHeight/2)*(Math.sin(2*Math.PI*((sprite_i)-1.75)/7))+(maxJumpHeight/2);
+    public void animate() {
+        if (animI>=animInterval) {
+            sprite_i = (sprite_i+=1)%frames.size();
+            cur_sprite = frames.get(sprite_i);
+            if (isWalking) {
+                jheight = (maxJumpHeight/2)*(Math.sin(2*Math.PI*((sprite_i)-1.75)/7))+(maxJumpHeight/2);
+            } else {
+                jheight = 0;
+            }
+            animI = 0;
         } else {
-            jheight = 0;
+            animI++;
         }
     }
     public void setAngle(double angle) {

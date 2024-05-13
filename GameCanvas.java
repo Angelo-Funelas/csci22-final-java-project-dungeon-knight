@@ -103,13 +103,5 @@ public class GameCanvas extends JComponent {
             GameObjects.remove(obj);
         }
     }
-
-    public void tickObjects(long dt) {
-        synchronized (GameObjects) {
-            for (GameObject object : GameObjects) {
-                object.update(dt);
-            }
-        }
-    }
 }
 

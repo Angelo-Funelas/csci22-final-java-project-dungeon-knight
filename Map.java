@@ -5,8 +5,7 @@ import java.util.Random;
 public class Map {
     private ArrayList<DungeonPiece> mapPieces;
     private GameCanvas canvas;
-    private int[] startingPos;
-    final String[] dirs = {"up","down","left","right"};
+    private final String[] dirs = {"up","down","left","right"};
     private boolean endRoomGenerated;
 
     public ArrayList<CollisionBox> getCollisionBoxes() {
@@ -137,13 +136,6 @@ public class Map {
         Arrays.fill(doors, false);
         doors[doorOpening] = true;
 
-        // DungeonRoom starterRoom = DungeonGenerator.GenerateBattleRoom(-(16*16/2), -(16*16/2), 17, 17, true,true,true,true, random);
-        // startingPos = starterRoom.getRoomCenter();
-
-        // addPiece(starterRoom);
-        // this.canvas.addGameObject(starterRoom);
-        // 16 between 27, 27, 17, 13
-
         int maxDepth = 3;
         int gridSize = 1+maxDepth*2;
         ArrayList<ArrayList<mapModelPiece>> mapGrid = new ArrayList<ArrayList<mapModelPiece>>();
@@ -162,10 +154,6 @@ public class Map {
 
         rootRoom.generatePaths(random, 0, maxDepth, mapGrid, maxDepth, maxDepth);
         rootRoom.generatePieces(null, random, 0, maxDepth, this);
-    }
-
-    public int[] getStartingPos() {
-        return startingPos;
     }
 
     public void addPiece(DungeonPiece piece) {
