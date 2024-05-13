@@ -35,7 +35,7 @@ public class GoblinGuard implements GameObject, Entity {
         frame.addEntity(this);
         canvas.addGameObject(this);
         animationThread.addSprite(sprite);
-        health = 10;
+        health = 100;
     }
 
     public double getX() {return x;}
