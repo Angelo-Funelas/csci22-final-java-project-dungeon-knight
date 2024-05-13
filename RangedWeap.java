@@ -12,8 +12,9 @@ public class RangedWeap extends Weapon implements GameObject {
     private GameCanvas canvas;
     private GameFrame frame;
     private ArrayList<Entity> entities;
+    private GameSound gs;
 
-    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList<Entity> entities) {
+    public RangedWeap(String type, Player parent, boolean ally, GameCanvas canvas, GameFrame frame, ArrayList<Entity> entities, GameSound gs) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         switch (type) {
             case "badPistol":
@@ -38,6 +39,7 @@ public class RangedWeap extends Weapon implements GameObject {
         rateOfFire = 2;
         this.frame = frame;
         this.entities = entities;
+        this.gs = gs;
     }
 
     public double getX() {return x;}
@@ -103,6 +105,8 @@ public class RangedWeap extends Weapon implements GameObject {
             args.add(new emitArg("double", dmg));
             frame.sendCommand("newBullet", args);
         }
+        gs.setFile(0);
+        gs.play(0f);
         new Bullet("player", x+xOffset, y, dx, dy, angle, canvas, frame, entities, 0, dmg);
     }
 

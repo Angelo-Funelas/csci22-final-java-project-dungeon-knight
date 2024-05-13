@@ -175,8 +175,8 @@ public class Map {
                     } else {
                         int enemyCount = r.nextInt(6 + 1) + 1;
                         for (int e=0;e<enemyCount;e++) {
-                            int spawn_x = (int)newRoom.getX()+r.nextInt(newRoom.getWidth()-16) + 16;
-                            int spawn_y = (int)newRoom.getY()+r.nextInt(newRoom.getHeight()-24) + 24;
+                            int spawn_x = (int)newRoom.getX()+r.nextInt(newRoom.getWidth()-32) + 16;
+                            int spawn_y = (int)newRoom.getY()+r.nextInt(newRoom.getHeight()-64) + 8;
                             GoblinGuard newEnemy = new GoblinGuard(canvas, frame, spawn_x, spawn_y, animationThread);
                         }
                     }

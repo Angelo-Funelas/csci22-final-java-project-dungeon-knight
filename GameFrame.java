@@ -1,5 +1,6 @@
 import java.awt.event.*;
 
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 
 import java.io.*;
@@ -29,9 +30,9 @@ public class GameFrame implements KeyListener {
     private DataInputStream dataInpStream;
     private DataOutputStream dataOutStream;
     private int lastSeed;
+    private GameSound gs;
 
-
-    public GameFrame() {
+    public void initializeGame() {
         frame = new JFrame();
         entities = new ArrayList<Entity>();
         entityQueue = new ArrayList<Entity>();
@@ -41,6 +42,61 @@ public class GameFrame implements KeyListener {
         connectedToServer = false;
         clientID = -1;
         lastSeed = 0;
+        gs = new GameSound();
+    }
+
+    public void setUpGUI() {
+        canvas = new GameCanvas(canvasWidth,canvasHeight);
+        frame.setSize(canvasWidth,canvasHeight);
+        frame.setTitle("Final Project - Dungeon Knight");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.add(canvas);
+        frame.pack();
+        frame.addKeyListener(this);
+        frame.setFocusable(true);
+        frame.addWindowFocusListener(new WindowAdapter() {
+            public void windowLostFocus(WindowEvent e) {
+                player.setUp(false);
+                player.setDown(false);
+                player.setLeft(false);
+                player.setRight(false);
+            }
+        });
+    }
+
+    public void startGameLoop() {
+        lastFrameTime = System.currentTimeMillis();
+        Timer gameTicker = new Timer(1000/GameStarter.framerate, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                tick();
+            }
+        });
+        gameTicker.start();
+        gs.setFile(1);
+        gs.play(-8.0f);
+        gs.loop();
+    }
+
+    public void startAnimationThread() {
+        AnimationThread = new AnimationThread();
+        AnimationThread.start();
+    }
+
+    public void initPlayer() {
+        player = new Player(26, 0,0,false, canvas, this, AnimationThread, entities, gs);
+        canvas.focus(player);
+        new GoblinGuard(canvas, this, 0, 0, AnimationThread);
+        connectToServer();
+    }
+    public void prepareLevel(int seed) {
+        curMap = new Map(3, 3, canvas, this, seed, AnimationThread);
+        if (seed!=lastSeed) {
+            player.setX(0);
+            player.setY(0);
+            lastSeed = seed;
+        }
     }
 
     private void connectToServer() {
@@ -61,8 +117,10 @@ public class GameFrame implements KeyListener {
 
             clients = new HashMap<Integer, Player>();
             connectedToServer = true;
+            canvas.setTM("game");
         } catch (IOException ex) {
             System.out.println("IOException from connectToServer()");
+            canvas.setTM("connecting");
             try {
                 Thread.sleep(1000); // some delay for writing data
             }
@@ -75,13 +133,15 @@ public class GameFrame implements KeyListener {
         System.out.println("Client #" + id + " joined!");
         int newClientId = id;
         if (newClientId != clientID) {
-            Player ally = new Player(26, (int)x, (int)y, true, canvas, this, AnimationThread, entities);
+            Player ally = new Player(26, (int)x, (int)y, true, canvas, this, AnimationThread, entities, gs);
             clients.put(newClientId, ally);
         }
     }
 
     public void sendCommand(String command, ArrayList<emitArg> args) {
-        wtsRunnable.sendCommand(command, args);
+        if (wtsRunnable.isSendSafe()) {       
+            wtsRunnable.sendCommand(command, args);
+        }
     }
 
     
@@ -203,7 +263,7 @@ public class GameFrame implements KeyListener {
 
     private class WriteToServer implements Runnable {
         private DataOutputStream dataOut;
-        private boolean running;
+        private boolean running, sendSafe;
 
         public WriteToServer(DataOutputStream out) {
             dataOut = out;
@@ -213,9 +273,14 @@ public class GameFrame implements KeyListener {
         public void stopThread() {
             running = false;
         }
+
+        public boolean isSendSafe() {
+            return sendSafe;
+        }
         
         public void sendCommand(String command, ArrayList<emitArg> args) {
             try {
+                sendSafe = false;
                 dataOut.writeUTF("com_"+command);
                 for (emitArg arg : args) {
                     switch (arg.getType()) {
@@ -234,6 +299,7 @@ public class GameFrame implements KeyListener {
                     }
                 }
                 dataOut.flush();
+                sendSafe = true;
             } catch (IOException ex) {
                 System.out.println("IOException at sendCommand");
             } 
@@ -261,57 +327,6 @@ public class GameFrame implements KeyListener {
                     System.out.println("InterruptedException from WTS run()");
                 }
             }
-        }
-    }
-
-    public void setUpGUI() {
-        canvas = new GameCanvas(canvasWidth,canvasHeight);
-        frame.setSize(canvasWidth,canvasHeight);
-        frame.setTitle("Final Project - Dungeon Knight");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.add(canvas);
-        frame.pack();
-        frame.addKeyListener(this);
-        frame.setFocusable(true);
-        frame.addWindowFocusListener(new WindowAdapter() {
-            public void windowLostFocus(WindowEvent e) {
-                player.setUp(false);
-                player.setDown(false);
-                player.setLeft(false);
-                player.setRight(false);
-            }
-        });
-    }
-
-    public void startGameLoop() {
-        lastFrameTime = System.currentTimeMillis();
-        Timer gameTicker = new Timer(1000/GameStarter.framerate, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                tick();
-            }
-        });
-        gameTicker.start();
-    }
-
-    public void startAnimationThread() {
-        AnimationThread = new AnimationThread();
-        AnimationThread.start();
-    }
-
-    public void initPlayer() {
-        player = new Player(26, 0,0,false, canvas, this, AnimationThread, entities);
-        canvas.focus(player);
-        GoblinGuard test = new GoblinGuard(canvas, this, 0, 0, AnimationThread);
-        connectToServer();
-    }
-    public void prepareLevel(int seed) {
-        curMap = new Map(3, 3, canvas, this, seed, AnimationThread);
-        if (seed!=lastSeed) {
-            player.setX(0);
-            player.setY(0);
-            lastSeed = seed;
         }
     }
 

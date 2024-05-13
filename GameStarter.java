@@ -22,6 +22,7 @@ public class GameStarter {
             host = "gemplo.com";
         }
         GameFrame game = new GameFrame();
+        game.initializeGame();
         game.setUpGUI();
         game.startAnimationThread();
         game.initPlayer();

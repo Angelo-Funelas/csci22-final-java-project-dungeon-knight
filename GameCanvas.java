@@ -13,6 +13,7 @@ public class GameCanvas extends JComponent {
     private Color backgroundColor;
     private GameObject target;
     private double zoom;
+    private TitleMachine tm;
     
     public static double mouseX, mouseY, translateX, translateY;
     public static boolean isLeftButtonPressed;
@@ -21,6 +22,7 @@ public class GameCanvas extends JComponent {
         width = w;
         height = h;
         setPreferredSize(new Dimension(w,h));
+        tm = new TitleMachine(w, h);
         GameObjects = new ArrayList<GameObject>();
         DrawThread drawThread = new DrawThread(this);
         drawThread.start();
@@ -62,6 +64,10 @@ public class GameCanvas extends JComponent {
         target = obj;
     }
 
+    public void setTM(String state) {
+        tm.setState(state);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -87,6 +93,7 @@ public class GameCanvas extends JComponent {
             }
         }
         g2d.setTransform(reset);
+        tm.draw(g2d);
     }
 
     public void addGameObject(GameObject obj) {

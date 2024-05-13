@@ -18,8 +18,9 @@ public class Player implements GameObject, Entity {
     private ArrayList<Entity> entities;
     private final int team = 0;
     private long dt;
+    private GameSound gs;
 
-    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, AnimationThread animationThread, ArrayList<Entity> entities) {
+    public Player(int scale, int x, int y, boolean ally, GameCanvas canvas, GameFrame frame, AnimationThread animationThread, ArrayList<Entity> entities, GameSound gs) {
         ArrayList<File> sprite_frames = new ArrayList<File>();
         sprite_frames.add(new File("sprites/rogue_frame_0.png"));
         sprite_frames.add(new File("sprites/rogue_frame_1.png"));
@@ -48,7 +49,8 @@ public class Player implements GameObject, Entity {
         CollisionBox collBox = new CollisionBox(x, y, width-8, height-6);
         collBoxes.add(collBox);
         weapons = new ArrayList<Weapon>();
-        weapons.add(new RangedWeap("badPistol", this, ally, canvas, frame, entities));
+        this.gs = gs;
+        weapons.add(new RangedWeap("badPistol", this, ally, canvas, frame, entities, gs));
         curWeapon_i = 0;
         canvas.addGameObject(this);
         this.frame = frame;
